@@ -165,7 +165,7 @@ THEN UPDATE SET
     target.is_current = FALSE,
     target.modified_date = CURRENT_TIMESTAMP()
 
--- Step 2: Insert new and updated records as the latest active records
+-- Step 2: Insert new and updated records as the latest active records this is for new entry that is not present in target table
 WHEN NOT MATCHED 
 THEN INSERT (
     Patient_Key,
@@ -206,6 +206,17 @@ VALUES (
 
 -- DROP quality_check table
 DROP TABLE IF EXISTS `avd-databricks-demo.silver_dataset.quality_checks`;
+
+-- IF record exists and has changed → update old + insert new
+-- ELSE IF record is new → insert it
+-- Finally → drop the temporary table
+-- I thought it will check from memory as it already checked initially
+-- But in SQL (including BigQuery), that's not how it works.
+-- The temporary table is stored in the database, not in memory.
+-- It will check updated value from 
+-- THEN UPDATE SET 
+--     target.is_current = FALSE,
+--     target.modified_date = CURRENT_TIMESTAMP()
 
 -------------------------------------------------------------------------------------------------------
 
