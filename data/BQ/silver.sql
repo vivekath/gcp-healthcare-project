@@ -1,7 +1,4 @@
--- IN THIS WE WE WILL IMPLEMENTING BOTH SCD2 AND CDM LOGIC FOR THE SILVER TABLES
-
--- 1. Create table departments by Merge Data from Hospital A & B  
-CREATE TABLE IF NOT EXISTS `avd-databricks-demo.silver_dataset.departments` (
+CREATE TABLE IF NOT EXISTS `quantum-episode-345713.silver_dataset.DIM_DEPARTMENTS` (
     Dept_Id STRING,
     SRC_Dept_Id STRING,
     Name STRING,
@@ -10,11 +7,9 @@ CREATE TABLE IF NOT EXISTS `avd-databricks-demo.silver_dataset.departments` (
 );
 
 
--- 2. Truncate Silver Table Before Inserting 
-TRUNCATE TABLE `avd-databricks-demo.silver_dataset.departments`;
+TRUNCATE TABLE `quantum-episode-345713.silver_dataset.DIM_DEPARTMENTS`;
 
--- 3. full load by Inserting merged Data 
-INSERT INTO `avd-databricks-demo.silver_dataset.departments`
+INSERT INTO `quantum-episode-345713.silver_dataset.DIM_DEPARTMENTS`
 SELECT DISTINCT 
     CONCAT(deptid, '-', datasource) AS Dept_Id,
     deptid AS SRC_Dept_Id,
@@ -25,15 +20,12 @@ SELECT DISTINCT
         ELSE FALSE 
     END AS is_quarantined
 FROM (
-    SELECT DISTINCT *, 'hosa' AS datasource FROM `avd-databricks-demo.bronze_dataset.departments_ha`
+    SELECT DISTINCT *, 'hosa' AS datasource FROM `quantum-episode-345713.bronze_dataset.departments_ha`
     UNION ALL
-    SELECT DISTINCT *, 'hosb' AS datasource FROM `avd-databricks-demo.bronze_dataset.departments_hb`
+    SELECT DISTINCT *, 'hosb' AS datasource FROM `quantum-episode-345713.bronze_dataset.departments_hb`
 );
-
--------------------------------------------------------------------------------------------------------
-
--- 1. Create table providers by Merge Data from Hospital A & B  
-CREATE TABLE IF NOT EXISTS `avd-databricks-demo.silver_dataset.providers` (
+-----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `quantum-episode-345713.silver_dataset.DIM_PROVIDERS` (
     ProviderID STRING,
     FirstName STRING,
     LastName STRING,
@@ -44,11 +36,9 @@ CREATE TABLE IF NOT EXISTS `avd-databricks-demo.silver_dataset.providers` (
     is_quarantined BOOLEAN
 );
 
--- 2. Truncate Silver Table Before Inserting 
-TRUNCATE TABLE `avd-databricks-demo.silver_dataset.providers`;
+TRUNCATE TABLE `quantum-episode-345713.silver_dataset.DIM_PROVIDERS`;
 
--- 3. full load by Inserting merged Data 
-INSERT INTO `avd-databricks-demo.silver_dataset.providers`
+INSERT INTO `quantum-episode-345713.silver_dataset.DIM_PROVIDERS`
 SELECT DISTINCT 
     ProviderID,
     FirstName,
@@ -62,15 +52,12 @@ SELECT DISTINCT
         ELSE FALSE 
     END AS is_quarantined
 FROM (
-    SELECT DISTINCT *, 'hosa' AS datasource FROM `avd-databricks-demo.bronze_dataset.providers_ha`
+    SELECT DISTINCT *, 'hosa' AS datasource FROM `quantum-episode-345713.bronze_dataset.providers_ha`
     UNION ALL
-    SELECT DISTINCT *, 'hosb' AS datasource FROM `avd-databricks-demo.bronze_dataset.providers_hb`
+    SELECT DISTINCT *, 'hosb' AS datasource FROM `quantum-episode-345713.bronze_dataset.providers_hb`
 );
-
--------------------------------------------------------------------------------------------------------
-
--- 1. Create patients Table in BigQuery
-CREATE TABLE IF NOT EXISTS `avd-databricks-demo.silver_dataset.patients` (
+-----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `quantum-episode-345713.silver_dataset.DIM_PATIENTS` (
     Patient_Key STRING,
     SRC_PatientID STRING,
     FirstName STRING,
@@ -88,11 +75,9 @@ CREATE TABLE IF NOT EXISTS `avd-databricks-demo.silver_dataset.patients` (
     modified_date TIMESTAMP,
     is_current BOOL
 );
-
---Create a quality_checks temp table
-CREATE OR REPLACE TABLE `avd-databricks-demo.silver_dataset.quality_checks` AS
-SELECT DISTINCT 
-    CONCAT(SRC_PatientID, '-', datasource) AS Patient_Key,
+create or replace table `quantum-episode-345713.silver_dataset.quality_checks` as
+select distinct 
+CONCAT(SRC_PatientID, '-', datasource) AS Patient_Key,
     SRC_PatientID,
     FirstName,
     LastName,
@@ -108,8 +93,8 @@ SELECT DISTINCT
         WHEN SRC_PatientID IS NULL OR DOB IS NULL OR FirstName IS NULL OR LOWER(FirstName) = 'null' THEN TRUE
         ELSE FALSE
     END AS is_quarantined
-FROM (
-    SELECT DISTINCT 
+from (
+SELECT DISTINCT 
         PatientID AS SRC_PatientID,
         FirstName,
         LastName,
@@ -121,7 +106,7 @@ FROM (
         Address,
         ModifiedDate,
         'hosa' AS datasource
-    FROM `avd-databricks-demo.bronze_dataset.patients_ha`
+    FROM `quantum-episode-345713.bronze_dataset.patients_ha`
     
     UNION ALL
 
@@ -137,36 +122,35 @@ FROM (
         Address,
         ModifiedDate,
         'hosb' AS datasource
-    FROM `avd-databricks-demo.bronze_dataset.patients_hb`
+    FROM `quantum-episode-345713.bronze_dataset.patients_hb`
 );
 
--- 3. Apply SCD Type 2 Logic with MERGE
-MERGE INTO `avd-databricks-demo.silver_dataset.patients` AS target
-USING `avd-databricks-demo.silver_dataset.quality_checks` AS source
+MERGE INTO `quantum-episode-345713.silver_dataset.DIM_PATIENTS` AS target
+USING `quantum-episode-345713.silver_dataset.quality_checks` AS source
 ON target.Patient_Key = source.Patient_Key
 AND target.is_current = TRUE 
 
--- Step 1: Mark existing records as historical if any column has changed
+-- 1. Close out old row when something changed
 WHEN MATCHED AND (
-    target.SRC_PatientID <> source.SRC_PatientID OR
-    target.FirstName <> source.FirstName OR
-    target.LastName <> source.LastName OR
-    target.MiddleName <> source.MiddleName OR
-    target.SSN <> source.SSN OR
-    target.PhoneNumber <> source.PhoneNumber OR
-    target.Gender <> source.Gender OR
-    target.DOB <> source.DOB OR
-    target.Address <> source.Address OR
-    target.SRC_ModifiedDate <> source.SRC_ModifiedDate OR
-    target.datasource <> source.datasource OR
-    target.is_quarantined <> source.is_quarantined
+    target.SRC_PatientID     <> source.SRC_PatientID OR
+    target.FirstName         <> source.FirstName OR
+    target.LastName          <> source.LastName OR
+    target.MiddleName        <> source.MiddleName OR
+    target.SSN               <> source.SSN OR
+    target.PhoneNumber       <> source.PhoneNumber OR
+    target.Gender            <> source.Gender OR
+    target.DOB               <> source.DOB OR
+    target.Address           <> source.Address OR
+    target.SRC_ModifiedDate  <> source.SRC_ModifiedDate OR
+    target.datasource        <> source.datasource OR
+    target.is_quarantined    <> source.is_quarantined
 )
 THEN UPDATE SET 
     target.is_current = FALSE,
     target.modified_date = CURRENT_TIMESTAMP()
 
--- Step 2: Insert new and updated records as the latest active records this is for new entry that is not present in target table
-WHEN NOT MATCHED 
+-- 2. Insert a new row when changes are detected or no match exists
+WHEN NOT MATCHED BY TARGET
 THEN INSERT (
     Patient_Key,
     SRC_PatientID,
@@ -199,29 +183,14 @@ VALUES (
     source.SRC_ModifiedDate,
     source.datasource,
     source.is_quarantined,
-    CURRENT_TIMESTAMP(),  
-    CURRENT_TIMESTAMP(),  
-    TRUE 
+    CURRENT_TIMESTAMP(),
+    CURRENT_TIMESTAMP(),
+    TRUE
 );
 
--- DROP quality_check table
-DROP TABLE IF EXISTS `avd-databricks-demo.silver_dataset.quality_checks`;
-
--- IF record exists and has changed → update old + insert new
--- ELSE IF record is new → insert it
--- Finally → drop the temporary table
--- I thought it will check from memory as it already checked initially
--- But in SQL (including BigQuery), that's not how it works.
--- The temporary table is stored in the database, not in memory.
--- It will check updated value from 
--- THEN UPDATE SET 
---     target.is_current = FALSE,
---     target.modified_date = CURRENT_TIMESTAMP()
-
--------------------------------------------------------------------------------------------------------
-
--- 1. Create transactions Table in BigQuery
-CREATE TABLE IF NOT EXISTS `avd-databricks-demo.silver_dataset.transactions` (
+DROP TABLE IF EXISTS `quantum-episode-345713.silver_dataset.quality_checks`;
+-----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `quantum-episode-345713.silver_dataset.DIM_TRANSACTIONS` (
     Transaction_Key STRING,
     SRC_TransactionID STRING,
     EncounterID STRING,
@@ -252,7 +221,7 @@ CREATE TABLE IF NOT EXISTS `avd-databricks-demo.silver_dataset.transactions` (
 );
 
 -- 2. Create a quality_checks temp table
-CREATE OR REPLACE TABLE `avd-databricks-demo.silver_dataset.quality_checks` AS
+CREATE OR REPLACE TABLE `quantum-episode-345713.silver_dataset.quality_checks` AS
 SELECT DISTINCT 
     CONCAT(TransactionID, '-', datasource) AS Transaction_Key,
     TransactionID AS SRC_TransactionID,
@@ -282,14 +251,13 @@ SELECT DISTINCT
         ELSE FALSE
     END AS is_quarantined
 FROM (
-    SELECT DISTINCT *, 'hosa' AS datasource FROM `avd-databricks-demo.bronze_dataset.transactions_ha`
+    SELECT DISTINCT *, 'hosa' AS datasource FROM `quantum-episode-345713.bronze_dataset.transactions_ha`
     UNION ALL
-    SELECT DISTINCT *, 'hosb' AS datasource FROM `avd-databricks-demo.bronze_dataset.transactions_hb`
+    SELECT DISTINCT *, 'hosb' AS datasource FROM `quantum-episode-345713.bronze_dataset.transactions_hb`
 );
 
--- 3. Apply SCD Type 2 Logic with MERGE
-MERGE INTO `avd-databricks-demo.silver_dataset.transactions` AS target
-USING `avd-databricks-demo.silver_dataset.quality_checks` AS source
+MERGE INTO `quantum-episode-345713.silver_dataset.DIM_TRANSACTIONS` AS target
+USING `quantum-episode-345713.silver_dataset.quality_checks` AS source
 ON target.Transaction_Key = source.Transaction_Key
 AND target.is_current = TRUE 
 
@@ -324,7 +292,7 @@ THEN UPDATE SET
     target.modified_date = CURRENT_TIMESTAMP()
 
 -- Step 2: Insert new and updated records as the latest active records
-WHEN NOT MATCHED 
+WHEN NOT MATCHED BY TARGET
 THEN INSERT (
     Transaction_Key,
     SRC_TransactionID,
@@ -385,12 +353,11 @@ VALUES (
 );
 
 -- 4. DROP quality_check table
-DROP TABLE IF EXISTS `avd-databricks-demo.silver_dataset.quality_checks`;
-
--------------------------------------------------------------------------------------------------------
+DROP TABLE IF EXISTS `quantum-episode-345713.silver_dataset.quality_checks`;
+-----------------------------------------------------
 
 -- 1. Create the encounters Table in BigQuery
-CREATE TABLE IF NOT EXISTS `avd-databricks-demo.silver_dataset.encounters` (
+CREATE TABLE IF NOT EXISTS `quantum-episode-345713.silver_dataset.DIM_ENCOUNTERS` (
     Encounter_Key STRING,
     SRC_EncounterID STRING,
     PatientID STRING,
@@ -408,7 +375,7 @@ CREATE TABLE IF NOT EXISTS `avd-databricks-demo.silver_dataset.encounters` (
 );
 
 -- 2. Create a quality_checks temp table for encounters
-CREATE OR REPLACE TABLE `avd-databricks-demo.silver_dataset.quality_checks_encounters` AS
+CREATE OR REPLACE TABLE `quantum-episode-345713.silver_dataset.quality_checks_encounters` AS
 SELECT DISTINCT 
     CONCAT(SRC_EncounterID, '-', datasource) AS Encounter_Key,
     SRC_EncounterID,
@@ -435,7 +402,7 @@ FROM (
         ProcedureCode,
         ModifiedDate,
         'hosa' AS datasource
-    FROM `avd-databricks-demo.bronze_dataset.encounters_ha`
+    FROM `quantum-episode-345713.bronze_dataset.encounters_ha`
     
     UNION ALL
 
@@ -449,12 +416,12 @@ FROM (
         ProcedureCode,
         ModifiedDate,
         'hosb' AS datasource
-    FROM `avd-databricks-demo.bronze_dataset.encounters_hb`
+    FROM `quantum-episode-345713.bronze_dataset.encounters_hb`
 );
 
 -- 3. Apply SCD Type 2 Logic with MERGE
-MERGE INTO `avd-databricks-demo.silver_dataset.encounters` AS target
-USING `avd-databricks-demo.silver_dataset.quality_checks_encounters` AS source
+MERGE INTO `quantum-episode-345713.silver_dataset.DIM_ENCOUNTERS` AS target
+USING `quantum-episode-345713.silver_dataset.quality_checks_encounters` AS source
 ON target.Encounter_Key = source.Encounter_Key
 AND target.is_current = TRUE 
 
@@ -476,7 +443,7 @@ THEN UPDATE SET
     target.modified_date = CURRENT_TIMESTAMP()
 
 -- Step 2: Insert new and updated records as the latest active records
-WHEN NOT MATCHED 
+WHEN NOT MATCHED BY TARGET
 THEN INSERT (
     Encounter_Key,
     SRC_EncounterID,
@@ -511,12 +478,10 @@ VALUES (
 );
 
 -- 4. DROP quality_check table
-DROP TABLE IF EXISTS `avd-databricks-demo.silver_dataset.quality_checks_encounters`;
-
--------------------------------------------------------------------------------------------------------
-
+DROP TABLE IF EXISTS `quantum-episode-345713.silver_dataset.quality_checks_encounters`;
+--------------------------
 -- 1. Create the Claims Table in BigQuery
-CREATE TABLE IF NOT EXISTS `avd-databricks-demo.silver_dataset.claims` (
+CREATE TABLE IF NOT EXISTS `quantum-episode-345713.silver_dataset.DIM_CLAIMS` (
     Claim_Key STRING,
     SRC_ClaimID STRING,
     TransactionID STRING,
@@ -544,7 +509,7 @@ CREATE TABLE IF NOT EXISTS `avd-databricks-demo.silver_dataset.claims` (
 );
 
 -- 2. Create a quality_checks temp table for claims
-CREATE OR REPLACE TABLE `avd-databricks-demo.silver_dataset.quality_checks_claims` AS
+CREATE OR REPLACE TABLE `quantum-episode-345713.silver_dataset.quality_checks_claims` AS
 SELECT 
     CONCAT(SRC_ClaimID, '-', datasource) AS Claim_Key,
     SRC_ClaimID,
@@ -591,12 +556,12 @@ FROM (
         InsertDate,
         ModifiedDate,
         'hosa' AS datasource
-    FROM `avd-databricks-demo.bronze_dataset.claims`
+    FROM `quantum-episode-345713.bronze_dataset.claims`
 );
 
 -- 3. Apply SCD Type 2 Logic with MERGE
-MERGE INTO `avd-databricks-demo.silver_dataset.claims` AS target
-USING `avd-databricks-demo.silver_dataset.quality_checks_claims` AS source
+MERGE INTO `quantum-episode-345713.silver_dataset.DIM_CLAIMS` AS target
+USING `quantum-episode-345713.silver_dataset.quality_checks_claims` AS source
 ON target.Claim_Key = source.Claim_Key
 AND target.is_current = TRUE 
 
@@ -627,7 +592,7 @@ THEN UPDATE SET
     target.modified_date = CURRENT_TIMESTAMP()
 
 -- Step 2: Insert new and updated records as the latest active records
-WHEN NOT MATCHED 
+WHEN NOT MATCHED BY TARGET
 THEN INSERT (
     Claim_Key,
     SRC_ClaimID,
@@ -682,12 +647,9 @@ VALUES (
 );
 
 -- 4. DROP quality_check table
-DROP TABLE IF EXISTS `avd-databricks-demo.silver_dataset.quality_checks_claims`;
-
--------------------------------------------------------------------------------------------------------
-
--- 1. Create the CP Codes Silver Table in BigQuery
-CREATE TABLE IF NOT EXISTS `avd-databricks-demo.silver_dataset.cpt_codes` (
+DROP TABLE IF EXISTS `quantum-episode-345713.silver_dataset.quality_checks_claims`;
+-----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `quantum-episode-345713.silver_dataset.DIM_CPT_CODES` (
     CP_Code_Key STRING,
     procedure_code_category STRING,
     cpt_codes STRING,
@@ -701,7 +663,7 @@ CREATE TABLE IF NOT EXISTS `avd-databricks-demo.silver_dataset.cpt_codes` (
 );
 
 -- 2. Create a quality_checks temp table for CP Codes
-CREATE OR REPLACE TABLE `avd-databricks-demo.silver_dataset.quality_checks_cpt_codes` AS
+CREATE OR REPLACE TABLE `quantum-episode-345713.silver_dataset.quality_checks_cpt_codes` AS
 SELECT 
     CONCAT(cpt_codes, '-', datasource) AS CP_Code_Key,
     procedure_code_category,
@@ -721,12 +683,12 @@ FROM (
         procedure_code_descriptions,
         code_status,
         'hosa' AS datasource
-    FROM `avd-databricks-demo.bronze_dataset.cpt_codes`
+    FROM `quantum-episode-345713.bronze_dataset.cpt_codes`
 );
 
 -- 3. Apply SCD Type 2 Logic with MERGE
-MERGE INTO `avd-databricks-demo.silver_dataset.cpt_codes` AS target
-USING `avd-databricks-demo.silver_dataset.quality_checks_cpt_codes` AS source
+MERGE INTO `quantum-episode-345713.silver_dataset.DIM_CPT_CODES` AS target
+USING `quantum-episode-345713.silver_dataset.quality_checks_cpt_codes` AS source
 ON target.CP_Code_Key = source.CP_Code_Key
 AND target.is_current = TRUE 
 
@@ -744,7 +706,7 @@ THEN UPDATE SET
     target.modified_date = CURRENT_TIMESTAMP()
 
 -- Step 2: Insert new and updated records as the latest active records
-WHEN NOT MATCHED 
+WHEN NOT MATCHED BY TARGET
 THEN INSERT (
     CP_Code_Key,
     procedure_code_category,
@@ -771,5 +733,5 @@ VALUES (
 );
 
 -- 4. DROP quality_check table
-DROP TABLE IF EXISTS `avd-databricks-demo.silver_dataset.quality_checks_cpt_codes`;
+DROP TABLE IF EXISTS `quantum-episode-345713.silver_dataset.quality_checks_cpt_codes`;
  
