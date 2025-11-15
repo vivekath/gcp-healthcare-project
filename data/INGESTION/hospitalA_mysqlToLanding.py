@@ -12,24 +12,23 @@ bq_client = bigquery.Client()
 spark = SparkSession.builder.appName("HospitalAMySQLToLanding").getOrCreate()
 
 # Google Cloud Storage (GCS) Configuration
-GCS_BUCKET = "healthcare-bucket-22032025"
+GCS_BUCKET = "heathcare-bucket-12112025"
 HOSPITAL_NAME = "hospital-a"
 LANDING_PATH = f"gs://{GCS_BUCKET}/landing/{HOSPITAL_NAME}/"
 ARCHIVE_PATH = f"gs://{GCS_BUCKET}/landing/{HOSPITAL_NAME}/archive/"
 CONFIG_FILE_PATH = f"gs://{GCS_BUCKET}/configs/load_config.csv"
 
 # BigQuery Configuration
-BQ_PROJECT = "avd-databricks-demo"
+BQ_PROJECT = "quantum-episode-345713"
 BQ_AUDIT_TABLE = f"{BQ_PROJECT}.temp_dataset.audit_log"
 BQ_LOG_TABLE = f"{BQ_PROJECT}.temp_dataset.pipeline_logs"
-BQ_TEMP_PATH = f"{GCS_BUCKET}/temp/"  
+BQ_TEMP_PATH = f"{GCS_BUCKET}/temp/"
 
-# MySQL Configuration
 MYSQL_CONFIG = {
-    "url": "jdbc:mysql://34.132.104.87:3306/hospital_a_db?useSSL=false&allowPublicKeyRetrieval=true",
+    "url": "jdbc:mysql://34.63.194.202:3306/hospital_a_db",
     "driver": "com.mysql.cj.jdbc.Driver",
     "user": "myuser",
-    "password": "mypass"
+    "password": "asdf@ATH10"
 }
 
 ##------------------------------------------------------------------------------------------------------------------##
@@ -45,8 +44,17 @@ def log_event(event_type, message, table=None):
         "table": table
     }
     log_entries.append(log_entry)
-    print(f"[{log_entry['timestamp']}] {event_type} - {message}")  # Print for visibility
-    
+    print(f"[{log_entry['timestamp']}] {event_type} - {message}")
+
+# Function to Read Config File from GCS
+def read_config_file():
+    df = spark.read.csv(CONFIG_FILE_PATH, header=True)
+    log_event("INFO", "✅ Successfully read the config file")
+    return df
+
+# read config file
+config_df = read_config_file()
+
 def save_logs_to_gcs():
     """Save logs to a JSON file and upload to GCS"""
     log_filename = f"pipeline_log_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}.json"
@@ -74,7 +82,8 @@ def save_logs_to_bigquery():
             .save()
         print("✅ Logs stored in BigQuery for future analysis")
     
-##------------------------------------------------------------------------------------------------------------------##
+    
+config_df.show()
 
 # Function to Move Existing Files to Archive
 def move_existing_files_to_archive(table):
@@ -84,7 +93,7 @@ def move_existing_files_to_archive(table):
     if not existing_files:
         log_event("INFO", f"No existing files for table {table}")
         return
-
+    
     for file in existing_files:
         source_blob = storage_client.bucket(GCS_BUCKET).blob(file)
 
@@ -103,13 +112,12 @@ def move_existing_files_to_archive(table):
         log_event("INFO", f"Moved {file} to {archive_path}", table=table)
         
 ##------------------------------------------------------------------------------------------------------------------##
-
 # Function to Get Latest Watermark from BigQuery Audit Table
 def get_latest_watermark(table_name):
     query = f"""
         SELECT MAX(load_timestamp) AS latest_timestamp
         FROM `{BQ_AUDIT_TABLE}`
-        WHERE tablename = '{table_name}' and data_source = "hospital_a_db"
+        WHERE table_name = '{table_name}' and data_source = "hospital_a_db"
     """
     query_job = bq_client.query(query)
     result = query_job.result()
@@ -118,7 +126,6 @@ def get_latest_watermark(table_name):
     return "1900-01-01 00:00:00"
 
 ##------------------------------------------------------------------------------------------------------------------##
-
 # Function to Extract Data from MySQL and Save to GCS
 def extract_and_save_to_landing(table, load_type, watermark_col):
     try:
@@ -127,7 +134,7 @@ def extract_and_save_to_landing(table, load_type, watermark_col):
 
         query = f"(SELECT * FROM {table}) AS t" if load_type.lower() == "full" else \
                 f"(SELECT * FROM {table} WHERE {watermark_col} > '{last_watermark}') AS t"
-
+        
         df = (spark.read.format("jdbc")
                 .option("url", MYSQL_CONFIG["url"])
                 .option("user", MYSQL_CONFIG["user"])
@@ -150,7 +157,7 @@ def extract_and_save_to_landing(table, load_type, watermark_col):
         # Insert Audit Entry
         audit_df = spark.createDataFrame([
             ("hospital_a_db", table, load_type, df.count(), datetime.datetime.now(), "SUCCESS")], 
-            ["data_source", "tablename", "load_type", "record_count", "load_timestamp", "status"])
+            ["data_source", "table_name", "load_type", "record_count", "load_timestamp", "status"])
 
         (audit_df.write.format("bigquery")
             .option("table", BQ_AUDIT_TABLE)
@@ -163,15 +170,6 @@ def extract_and_save_to_landing(table, load_type, watermark_col):
     except Exception as e:
         log_event("ERROR", f"Error processing {table}: {str(e)}", table=table)
 ##------------------------------------------------------------------------------------------------------------------##
-
-# Function to Read Config File from GCS
-def read_config_file():
-    df = spark.read.csv(CONFIG_FILE_PATH, header=True)
-    log_event("INFO", "✅ Successfully read the config file")
-    return df
-
-# read config file
-config_df = read_config_file()
 
 for row in config_df.collect():
     if row["is_active"] == '1' and row["datasource"] == "hospital_a_db": 

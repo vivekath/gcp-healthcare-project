@@ -1,4 +1,3 @@
-ProviderID,FirstName,LastName,Specialization,DeptID,NPI
 H2-PROV0001,Wanda,Ramos,Pediatrics,DEPT003,9903342850
 H2-PROV0002,Steven,Roach,Radiology,DEPT010,3653586329
 H2-PROV0003,Amber,Martin,Emergency Medicine,DEPT002,6917277775
