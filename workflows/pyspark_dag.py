@@ -13,7 +13,7 @@ from airflow.providers.google.cloud.operators.dataproc import (
 PROJECT_ID = "quantum-episode-345713"
 REGION = "us-central1"
 CLUSTER_NAME = "my-demo-cluster2"
-COMPOSER_BUCKET = "us-central1-demo-instance-12cd89f1-bucket"
+COMPOSER_BUCKET = "us-central1-demo-instance-1bf3538f-bucket"
 
 GCS_JOB_FILE_1 = f"gs://{COMPOSER_BUCKET}/data/INGESTION/hospitalA_mysqlToLanding.py"
 PYSPARK_JOB_1 = {
@@ -109,4 +109,5 @@ with DAG(
     )
 
 # define the task dependencies
+
 start_cluster >> pyspark_task_1 >> pyspark_task_2 >> pyspark_task_3 >> pyspark_task_4 >> stop_cluster
