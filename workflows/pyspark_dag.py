@@ -11,7 +11,7 @@ from airflow.providers.google.cloud.operators.dataproc import (
 
 # define the variables
 PROJECT_ID = "quantum-episode-345713"
-REGION = "us-central1"
+REGION = "us-east1"
 CLUSTER_NAME = "my-demo-cluster2"
 COMPOSER_BUCKET = "us-central1-demo-instance-1bf3538f-bucket"
 
@@ -111,3 +111,4 @@ with DAG(
 # define the task dependencies
 
 start_cluster >> pyspark_task_1 >> pyspark_task_2 >> pyspark_task_3 >> pyspark_task_4 >> stop_cluster
+
