@@ -18,17 +18,17 @@ class Constants:
         START_DATE_DAYS_AGO  = days_ago(1)
     
     class Parent_DAG:
-        DAG_ID="parent_dag",
-        SCHEDULE_INTERVAL="0 5 * * *",
-        DESCRIPTION="Parent DAG to trigger PySpark and BigQuery DAGs",
+        DAG_ID="parent_dag"
+        SCHEDULE_INTERVAL="0 5 * * *"
+        DESCRIPTION="Parent DAG to trigger PySpark and BigQuery DAGs"
         TAGS=["parent", "orchestration", "etl"]
         TRIGGER_PYSPARK_DAG = "trigger_pyspark_dag"
         TRIGGER_BIGQUERY_DAG = "trigger_bigquery_dag"
     
     class Pyspark_DAG:
         DAG_ID = "pyspark_dag"
-        SCHEDULE_INTERVAL=None,
-        DESCRIPTION="DAG to start a Dataproc cluster, run PySpark jobs, and stop the cluster",
+        SCHEDULE_INTERVAL=None
+        DESCRIPTION="DAG to start a Dataproc cluster, run PySpark jobs, and stop the cluster"
         TAGS=["pyspark", "dataproc", "etl", "marvel"]
         START_CLUSTER = "start_cluster"
         PYSPARK_TASK_1 = "pyspark_task_1"
@@ -41,10 +41,10 @@ class Constants:
     
     class BQ_DAG:
         DAG_ID = "bigquery_dag"
-        SCHEDULE_INTERVAL=None,
-        DESCRIPTION="DAG to run the bigquery jobs",
+        SCHEDULE_INTERVAL=None
+        DESCRIPTION="DAG to run the bigquery jobs"
         TAGS=["gcs", "bq", "etl", "marvel"]
-        BQ_SQL_AIRFLOW_COMPOSER_FILE_PATH = "/home/airflow/gcs/data/jobs/bq/{job_name}.sql"
+        BQ_SQL_AIRFLOW_COMPOSER_FILE_PATH = "/home/airflow/gcs/data/INGESTION/jobs/bq/{job_name}.sql"
         BRONZE_TABLES = "bronze_tables"
         SILVER_TABLES = "silver_tables"
         GOLD_TABLES = "gold_tables"
