@@ -1,5 +1,5 @@
 from pyspark.sql import SparkSession
-from constants import Constants
+from .constants import Constants
 
 spark = SparkSession.builder.appName(Constants.SPARK.APP_CPT_CODES_TO_BRONZE).getOrCreate()
 
