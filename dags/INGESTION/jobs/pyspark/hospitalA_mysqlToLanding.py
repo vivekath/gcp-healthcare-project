@@ -2,9 +2,9 @@
 from google.cloud import storage, bigquery
 from pyspark.sql import SparkSession
 import datetime
-from .constants import Constants
-from .config_reader import ConfigReader
-from .event_logger import EventLogger
+from configs.constants import Constants
+from config_reader import ConfigReader
+from event_logger import EventLogger
 from spark_builder import SparkBuilder
 
 # If using local notebook:

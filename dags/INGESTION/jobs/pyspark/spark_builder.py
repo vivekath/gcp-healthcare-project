@@ -1,5 +1,5 @@
 from pyspark.sql import SparkSession
-from .constants import Constants
+from configs.constants import Constants
 
 class SparkBuilder:
     def __init__(self):

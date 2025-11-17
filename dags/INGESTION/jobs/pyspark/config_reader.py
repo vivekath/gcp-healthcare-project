@@ -1,4 +1,4 @@
-from .constants import Constants
+from configs.constants import Constants
 import datetime
 
 class ConfigReader:

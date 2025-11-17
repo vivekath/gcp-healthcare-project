@@ -4,7 +4,7 @@ from pyspark.sql import SparkSession
 import datetime
 import json
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType,TimestampType
-from .constants import Constants
+from configs.constants import Constants
 
 storage_client = storage.Client()
 bq_client = bigquery.Client()

@@ -1,5 +1,5 @@
 import json
-from .constants import Constants
+from configs.constants import Constants
 
 class EventLogger:
     def __init__(self):  
