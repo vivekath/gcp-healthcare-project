@@ -11,12 +11,13 @@ steps:
       - "utils/add_dags_to_composer.py"
       - "--dags_directory=${_DAGS_DIRECTORY}"
       - "--dags_bucket=${_DAGS_BUCKET}"
-      # - "--data_directory=${_DATA_DIRECTORY}"
+      - "--data_directory=${_DATA_DIRECTORY}"
 
 options:
   logging: CLOUD_LOGGING_ONLY
 
 substitutions:
-  _DAGS_DIRECTORY: "dags/"
+  _DAGS_DIRECTORY: "workflows/"
   _DAGS_BUCKET: "us-central1-demo-instance-1bf3538f-bucket" # Replace with your Composer bucket
-  # _DATA_DIRECTORY: "data/"
+  _DATA_DIRECTORY: "data/"
+

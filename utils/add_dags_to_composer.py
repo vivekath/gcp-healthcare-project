@@ -46,19 +46,18 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Upload DAGs and data to Composer bucket.")
     parser.add_argument("--dags_directory", help="Path to DAGs directory.")
     parser.add_argument("--dags_bucket", help="GCS bucket name for DAGs.")
-    # parser.add_argument("--data_directory", help="Path to data directory.")
+    parser.add_argument("--data_directory", help="Path to data directory.")
 
     args = parser.parse_args()
 
-    # print(args.dags_directory, args.dags_bucket, args.data_directory)
-    print(args.dags_directory, args.dags_bucket)
+    print(args.dags_directory, args.dags_bucket, args.data_directory)
 
     if args.dags_directory and os.path.exists(args.dags_directory):
         upload_to_composer(args.dags_directory, args.dags_bucket, "dags/")
     else:
         print(f"⚠️ Skipping DAGs upload: '{args.dags_directory}' directory not found.")
 
-    # if args.data_directory and os.path.exists(args.data_directory):
-    #     upload_to_composer(args.data_directory, args.dags_bucket, "data/")
-    # else:
-    #     print(f"⚠️ Skipping Data upload: '{args.data_directory}' directory not found.")
+    if args.data_directory and os.path.exists(args.data_directory):
+        upload_to_composer(args.data_directory, args.dags_bucket, "data/")
+    else:
+        print(f"⚠️ Skipping Data upload: '{args.data_directory}' directory not found.")
