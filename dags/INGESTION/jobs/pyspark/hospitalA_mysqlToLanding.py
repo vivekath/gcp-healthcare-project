@@ -2,10 +2,10 @@
 from google.cloud import storage, bigquery
 from pyspark.sql import SparkSession
 import datetime
-from configs.constants import Constants
-from connector.config_reader import ConfigReader
-from connector.event_logger import EventLogger
-from connector.spark_builder import SparkBuilder
+from constants import Constants
+from config_reader import ConfigReader
+from event_logger import EventLogger
+from spark_builder import SparkBuilder
 
 # If using local notebook:
 # export GOOGLE_APPLICATION_CREDENTIALS="key.json"

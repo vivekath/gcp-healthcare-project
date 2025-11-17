@@ -1,6 +1,6 @@
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import input_file_name, when
-from configs.constants import Constants
+from constants import Constants
 
 spark = SparkSession.builder.appName(Constants.SPARK.APP_CLAIMS_TO_BRONZE).getOrCreate()
 
