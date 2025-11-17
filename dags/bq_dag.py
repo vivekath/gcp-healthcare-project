@@ -1,14 +1,15 @@
 import airflow
 from airflow import DAG
 from datetime import timedelta
+from airflow.utils.dates import days_ago
 from airflow.providers.google.cloud.operators.bigquery import BigQueryInsertJobOperator
-from configs.constants import Constants
+
 # Define constants
-PROJECT_ID = Constants.GCP.BQ_PROJECT_ID
-LOCATION = Constants.GCP.LOCATION
-SQL_FILE_PATH_1 = Constants.BQ_DAG.BQ_SQL_AIRFLOW_COMPOSER_FILE_PATH.format(job_name=Constants.Jobs.BRONZE) 
-SQL_FILE_PATH_2 = Constants.BQ_DAG.BQ_SQL_AIRFLOW_COMPOSER_FILE_PATH.format(job_name=Constants.Jobs.SILVER)
-SQL_FILE_PATH_3 = Constants.BQ_DAG.BQ_SQL_AIRFLOW_COMPOSER_FILE_PATH.format(job_name=Constants.Jobs.GOLD)
+PROJECT_ID = "quantum-episode-345713"
+LOCATION = "US"
+SQL_FILE_PATH_1 = "/home/airflow/gcs/dags/INGESTION/jobs/bq/bronze.sql"
+SQL_FILE_PATH_2 = "/home/airflow/gcs/data/INGESTION/jobs/bq/silver.sql"
+SQL_FILE_PATH_3 = "/home/airflow/gcs/data/INGESTION/jobs/bq/gold.sql"
 
 # Read SQL query from file
 def read_sql_file(file_path):
@@ -21,58 +22,58 @@ GOLD_QUERY = read_sql_file(SQL_FILE_PATH_3)
 
 # Define default arguments
 ARGS = {
-    "owner": Constants.DAG_ARGS.OWNER,
-    "start_date": Constants.DAG_ARGS.START_DATE,
-    "depends_on_past": Constants.DAG_ARGS.DEPENDS_ON_PAST,
-    "email_on_failure": Constants.DAG_ARGS.EMAIL_ON_FAILURE,
-    "email_on_retry": Constants.DAG_ARGS.EMAIL_ON_RETRY,
-    "email": Constants.DAG_ARGS.EMAIL,
-    "email_on_success": Constants.DAG_ARGS.EMAIL_ON_SUCCESS,
-    "retries": Constants.DAG_ARGS.RETRIES,
-    "retry_delay": Constants.DAG_ARGS.RETRY_DELAY
+    "owner": "VIVEK ATHILKAR",
+    "start_date": None,
+    "depends_on_past": False,
+    "email_on_failure": False,
+    "email_on_retry": False,
+    "email": ["vivekneosoft@gmail.com"],
+    "email_on_success": False,
+    "retries": 1,
+    "retry_delay": timedelta(minutes=5)
 }
 
 # Define the DAG
 with DAG(
-    dag_id=Constants.BQ_DAG.DAG_ID,
-    schedule_interval=Constants.BQ_DAG.SCHEDULE_INTERVAL,
-    description=Constants.BQ_DAG.DESCRIPTION,
+    dag_id="bigquery_dag",
+    schedule_interval=None,
+    description="DAG to run the bigquery jobs",
     default_args=ARGS,
-    tags=Constants.BQ_DAG.TAGS
+    tags=["gcs", "bq", "etl", "marvel"]
 ) as dag:
 
     # Task to create bronze table
     bronze_tables = BigQueryInsertJobOperator(
-        task_id=Constants.BQ_DAG.BRONZE_TABLES,
+        task_id="bronze_tables",
         configuration={
             "query": {
                 "query": BRONZE_QUERY,
-                "useLegacySql": Constants.BQ_DAG.USELEGACYSQL,
-                "priority": Constants.BQ_DAG.PRIORITY,
+                "useLegacySql": False,
+                "priority": "BATCH",
             }
         },
     )
 
     # Task to create silver table
     silver_tables = BigQueryInsertJobOperator(
-        task_id=Constants.BQ_DAG.SILVER_TABLES,
+        task_id="silver_tables",
         configuration={
             "query": {
                 "query": SILVER_QUERY,
-                "useLegacySql": Constants.BQ_DAG.USELEGACYSQL,
-                "priority": Constants.BQ_DAG.PRIORITY,
+                "useLegacySql": False,
+                "priority": "BATCH",
             }
         },
     )
 
     # Task to create gold table
     gold_tables = BigQueryInsertJobOperator(
-        task_id=Constants.BQ_DAG.GOLD_TABLES,
+        task_id="gold_tables",
         configuration={
             "query": {
                 "query": GOLD_QUERY,
-                "useLegacySql": Constants.BQ_DAG.USELEGACYSQL,
-                "priority": Constants.BQ_DAG.PRIORITY,
+                "useLegacySql": False,
+                "priority": "BATCH",
             }
         },
     )
