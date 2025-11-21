@@ -146,19 +146,19 @@ def extract_and_save_to_landing(table, load_type, watermark_col):
         log_event("SUCCESS", f"✅ Successfully extracted data from {table}", table=table)
 
         today = datetime.datetime.today().strftime('%d%m%Y')
-        JSON_FILE_PATH = f"landing/{HOSPITAL_NAME}/{table}/{table}_{today}.json"
+        # JSON_FILE_PATH = f"landing/{HOSPITAL_NAME}/{table}/{table}_{today}.json"
 
-        bucket = storage_client.bucket(GCS_BUCKET)
-        blob = bucket.blob(JSON_FILE_PATH)
-        blob.upload_from_string(df.toPandas().to_json(orient="records", lines=True), content_type="application/json")
+        # bucket = storage_client.bucket(GCS_BUCKET)
+        # blob = bucket.blob(JSON_FILE_PATH)
+        # blob.upload_from_string(df.toPandas().to_json(orient="records", lines=True), content_type="application/json")
  
-        # output_path = f"gs://{GCS_BUCKET}/landing/{HOSPITAL_NAME}/{table}/{today}/"
+        output_path = f"gs://{GCS_BUCKET}/landing/{HOSPITAL_NAME}/{table}/{today}/"
  
-        # (df.write
-        #     .mode("overwrite")
-        #     .format("json")
-        #     .option("compression", "gzip")
-        #     .save(output_path))
+        (df.write
+            .mode("overwrite")
+            .format("json")
+            .option("compression", "gzip")
+            .save(output_path))
 
         log_event("SUCCESS", f"✅ JSON file successfully written to {output_path}", table=table)
         
