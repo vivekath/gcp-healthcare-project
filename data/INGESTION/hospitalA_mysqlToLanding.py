@@ -134,14 +134,29 @@ def extract_and_save_to_landing(table, load_type, watermark_col):
 
         query = f"(SELECT * FROM {table}) AS t" if load_type.lower() == "full" else \
                 f"(SELECT * FROM {table} WHERE {watermark_col} > '{last_watermark}') AS t"
-        
+        partition_column = "id"
+        lower = 1            
+        upper = 320000000  
+
         df = (spark.read.format("jdbc")
-                .option("url", MYSQL_CONFIG["url"])
-                .option("user", MYSQL_CONFIG["user"])
-                .option("password", MYSQL_CONFIG["password"])
-                .option("driver", MYSQL_CONFIG["driver"])
-                .option("dbtable", query)
-                .load())
+            .option("url", MYSQL_CONFIG["url"])
+            .option("dbtable", query)
+            .option("user", MYSQL_CONFIG["user"])
+            .option("password", MYSQL_CONFIG["password"])
+            .option("driver", MYSQL_CONFIG["driver"])
+            .option("partitionColumn", partition_column)
+            .option("lowerBound", lower)
+            .option("upperBound", upper)
+            .option("numPartitions", 50)
+            .load())
+        
+        # df = (spark.read.format("jdbc")
+        #         .option("url", MYSQL_CONFIG["url"])
+        #         .option("user", MYSQL_CONFIG["user"])
+        #         .option("password", MYSQL_CONFIG["password"])
+        #         .option("driver", MYSQL_CONFIG["driver"])
+        #         .option("dbtable", query)
+        #         .load())
 
         log_event("SUCCESS", f"✅ Successfully extracted data from {table}", table=table)
 
