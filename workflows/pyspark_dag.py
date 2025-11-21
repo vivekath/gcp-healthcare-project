@@ -73,12 +73,12 @@ with DAG(
         cluster_name=CLUSTER_NAME,
     )
 
-    # pyspark_task_1 = DataprocSubmitJobOperator(
-    #     task_id="pyspark_task_1", 
-    #     job=PYSPARK_JOB_1, 
-    #     region=REGION, 
-    #     project_id=PROJECT_ID
-    # )
+    pyspark_task_1 = DataprocSubmitJobOperator(
+        task_id="pyspark_task_1", 
+        job=PYSPARK_JOB_1, 
+        region=REGION, 
+        project_id=PROJECT_ID
+    )
 
     pyspark_task_2 = DataprocSubmitJobOperator(
         task_id="pyspark_task_2", 
@@ -110,5 +110,5 @@ with DAG(
 
 # define the task dependencies
 
-# start_cluster >> pyspark_task_1 >> pyspark_task_2 >> pyspark_task_3 >> pyspark_task_4 >> stop_cluster
-start_cluster >> pyspark_task_2 >> pyspark_task_3 >> pyspark_task_4 >> stop_cluster
+start_cluster >> pyspark_task_1 >> pyspark_task_2 >> pyspark_task_3 >> pyspark_task_4 >> stop_cluster
+# start_cluster >> pyspark_task_2 >> pyspark_task_3 >> pyspark_task_4 >> stop_cluster
