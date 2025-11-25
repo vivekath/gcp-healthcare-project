@@ -7,6 +7,9 @@ from airflow.providers.google.cloud.operators.dataproc import (
     DataprocStartClusterOperator,
     DataprocStopClusterOperator,
     DataprocSubmitJobOperator,
+    DataprocCreateClusterOperator,
+    DataprocDeleteClusterOperator,
+    ClusterGenerator
 )
 
 # define the variables
@@ -43,6 +46,26 @@ PYSPARK_JOB_4 = {
     "pyspark_job": {"main_python_file_uri": GCS_JOB_FILE_4},
 }
 
+# CLUSTER_CONFIG = ClusterGenerator(
+#     project_id=PROJECT_ID,
+#     region=REGION,
+#     cluster_name=CLUSTER_NAME,
+#     master_machine_type="n1-standard-2",
+#     worker_machine_type="n1-standard-2",
+#     num_workers=2,
+#     master_disk_size=50,
+#     worker_disk_size=50,
+#     image_version="2.0-debian10",
+#     optional_components=["JUPYTER"],
+#     enable_component_gateway=True,
+#     initialization_actions=[
+#         f"gs://goog-dataproc-initialization-actions-us-east1/connectors/connectors.sh"
+#     ],
+#     metadata={
+#         "bigquery-connector-version": "1.2.0",
+#         "spark-bigquery-connector-version": "0.21.0",
+#     }
+# ).make()
 
 ARGS = {
     "owner": "VIVEK ATHILKAR",
@@ -65,6 +88,14 @@ with DAG(
     tags=["pyspark", "dataproc", "etl", "marvel"]
 ) as dag:
     
+    # create_cluster = DataprocCreateClusterOperator(
+    #     task_id="create_cluster",
+    #     project_id=PROJECT_ID,
+    #     cluster_config=CLUSTER_CONFIG,
+    #     region=REGION,
+    #     cluster_name=CLUSTER_NAME,
+    # )
+        
     # define the Tasks
     start_cluster = DataprocStartClusterOperator(
         task_id="start_cluster",
@@ -108,7 +139,14 @@ with DAG(
         cluster_name=CLUSTER_NAME,
     )
 
-# define the task dependencies
+    # delete_cluster = DataprocDeleteClusterOperator(
+    #     task_id="delete_cluster", 
+    #     project_id=PROJECT_ID, 
+    #     cluster_name=CLUSTER_NAME, 
+    #     region=REGION,
+    # )
 
+# define the task dependencies
 start_cluster >> pyspark_task_1 >> pyspark_task_2 >> pyspark_task_3 >> pyspark_task_4 >> stop_cluster
 # start_cluster >> pyspark_task_2 >> pyspark_task_3 >> pyspark_task_4 >> stop_cluster
+# create_cluster >> pyspark_task_1 >> pyspark_task_2 >> pyspark_task_3 >> pyspark_task_4 >> delete_cluster

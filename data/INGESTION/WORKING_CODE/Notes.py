@@ -1,18 +1,18 @@
-# CLUSTER_NAME="my-demo-cluster2"
-# REGION="us-east1"
+CLUSTER_NAME="my-demo-cluster2"
+REGION="us-east1"
 
-# gcloud dataproc clusters create ${CLUSTER_NAME} \
-#   --region=${REGION} \
-#   --num-workers=2 \
-#   --worker-machine-type=n1-standard-2 \
-#   --worker-boot-disk-size=50 \
-#   --master-machine-type=n1-standard-2 \
-#   --master-boot-disk-size=50 \
-#   --image-version=2.0-debian10 \
-#   --enable-component-gateway \
-#   --optional-components=JUPYTER \
-#   --initialization-actions=gs://goog-dataproc-initialization-actions-${REGION}/connectors/connectors.sh \
-#   --metadata bigquery-connector-version=1.2.0,spark-bigquery-connector-version=0.21.0
+gcloud dataproc clusters create ${CLUSTER_NAME} \
+  --region=${REGION} \
+  --num-workers=2 \
+  --worker-machine-type=n1-standard-2 \
+  --worker-boot-disk-size=50 \
+  --master-machine-type=n1-standard-2 \
+  --master-boot-disk-size=50 \
+  --image-version=2.0-debian10 \
+  --enable-component-gateway \
+  --optional-components=JUPYTER \
+  --initialization-actions=gs://goog-dataproc-initialization-actions-${REGION}/connectors/connectors.sh \
+  --metadata bigquery-connector-version=1.2.0,spark-bigquery-connector-version=0.21.0
 # ------------------------------------------------------------------------------
 # Prerequisites, created quantum-episode-345713:temp_dataset.audit_log => Used in inittail query
 # Remove columns name from csv file while uploading
@@ -103,3 +103,31 @@
 
 # https://www.youtube.com/watch?v=L4Ad7RQYv4o&list=PLLrA_pU9-Gz2DaQDcY5g9aYczmipBQ_Ek&index=7
 # MySQl => Datastream => BQ => Looker
+
+# How Do ETL Tools Handle Large Datasets? - The Friendly Statistician
+# 1. Selective extraction 
+# 2. Parallel processing
+# 3. Data Partitioning
+# 4. Scalable architecture
+
+# spark
+# 02 How Spark Works - Driver & Executors & Task | How Spark divide Job in Stages | What is Shuffle in Spark
+
+# Data lake with Pyspark through Dataproc GCP using Airflow => Medium article
+# https://ilhamaulanap.medium.com/data-lake-with-pyspark-through-dataproc-gcp-using-airflow-d3d6517f8168
+# https://github.com/vivekath/datalake-pyspark-airflow-gcp
+
+
+# can we do partitionBy for other file formates
+# If your workflow includes BigQuery, Dataproc, or analytics:
+# ✔ Best:
+# Parquet → most efficient + BigQuery friendly
+# ORC
+# ⚠️ OK but not ideal:
+# Avro
+# ❌ Not recommended with partitionBy:
+# JSON, CSV
+# They create too many small files and increase job time.
+
+# Metadata-Driven Approach, maintain config file for all models/tables, is_active is used to manage table
+# Slowly Changing Dimensions (SCD) Type 2 Implementation, take approval from client for full, incremental load tables
