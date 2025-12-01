@@ -46,26 +46,26 @@ PYSPARK_JOB_4 = {
     "pyspark_job": {"main_python_file_uri": GCS_JOB_FILE_4},
 }
 
-# CLUSTER_CONFIG = ClusterGenerator(
-#     project_id=PROJECT_ID,
-#     region=REGION,
-#     cluster_name=CLUSTER_NAME,
-#     master_machine_type="n1-standard-2",
-#     worker_machine_type="n1-standard-2",
-#     num_workers=2,
-#     master_disk_size=50,
-#     worker_disk_size=50,
-#     image_version="2.0-debian10",
-#     optional_components=["JUPYTER"],
-#     enable_component_gateway=True,
-#     initialization_actions=[
-#         f"gs://goog-dataproc-initialization-actions-us-east1/connectors/connectors.sh"
-#     ],
-#     metadata={
-#         "bigquery-connector-version": "1.2.0",
-#         "spark-bigquery-connector-version": "0.21.0",
-#     }
-# ).make()
+CLUSTER_CONFIG = ClusterGenerator(
+    project_id=PROJECT_ID,
+    region=REGION,
+    cluster_name=CLUSTER_NAME,
+    master_machine_type="n1-standard-2",
+    worker_machine_type="n1-standard-2",
+    num_workers=2,
+    master_disk_size=50,
+    worker_disk_size=50,
+    image_version="2.0-debian10",
+    optional_components=["JUPYTER"],
+    enable_component_gateway=True,
+    initialization_actions=[
+        f"gs://goog-dataproc-initialization-actions-us-east1/connectors/connectors.sh"
+    ],
+    metadata={
+        "bigquery-connector-version": "1.2.0",
+        "spark-bigquery-connector-version": "0.21.0",
+    }
+).make()
 
 ARGS = {
     "owner": "VIVEK ATHILKAR",
@@ -150,3 +150,50 @@ with DAG(
 start_cluster >> pyspark_task_1 >> pyspark_task_2 >> pyspark_task_3 >> pyspark_task_4 >> stop_cluster
 # start_cluster >> pyspark_task_2 >> pyspark_task_3 >> pyspark_task_4 >> stop_cluster
 # create_cluster >> pyspark_task_1 >> pyspark_task_2 >> pyspark_task_3 >> pyspark_task_4 >> delete_cluster
+
+# ✅ Recommended Cluster Configuration for 100M rows/day
+"""
+CLUSTER_CONFIG = ClusterGenerator(
+    project_id=PROJECT_ID,
+    region=REGION,
+    cluster_name=CLUSTER_NAME,
+
+    # Bigger machines
+    master_machine_type="n1-standard-4",
+    worker_machine_type="n1-standard-4",
+
+    # More workers for parallelism
+    num_workers=3,
+
+    # Add preemptible for cheap compute
+    num_preemptible_workers=2,
+    preemptible_worker_machine_type="n1-standard-4",
+
+    # Disks
+    master_disk_size=100,
+    worker_disk_size=100,
+
+    # Image version
+    image_version="2.1-debian11",
+
+    optional_components=["JUPYTER"],
+    enable_component_gateway=True,
+
+    initialization_actions=[
+        "gs://goog-dataproc-initialization-actions-us-east1/connectors/connectors.sh"
+    ],
+
+    metadata={
+        "bigquery-connector-version": "1.2.0",
+        "spark-bigquery-connector-version": "0.34.0",  # latest stable
+    },
+
+    # Enable autoscaling (very important for 100M+)
+    autoscaling_config="projects/{}/regions/{}/autoscalingPolicies/{}".format(
+        PROJECT_ID,
+        REGION,
+        "basic-spark-autoscale"
+    )
+
+).make()
+"""

@@ -74,6 +74,11 @@ gcloud dataproc clusters create ${CLUSTER_NAME} \
 # Maintain data history using day vise file archive
 # PySpark Dataframe schema (StructType, StructField)
 # Load Bronze table data using external table instead of managed table (Create table)
+# GCP services used => BQ, Cloud SQL, GCS, Dataproc, Cloud Build, Cloud Composer
+
+
+
+
 
 # Data Fusion (Too heavy, takes more time to load, better pyspark, is more custimizable, to control) => No code ETL solution provided by google cloud, simply drag and drop UI based tool
 # Cloud Functions => Event based compute system, serverless, event driven, small code snipets
