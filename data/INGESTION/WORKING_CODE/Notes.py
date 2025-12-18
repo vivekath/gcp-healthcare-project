@@ -39,8 +39,8 @@ gcloud dataproc clusters create ${CLUSTER_NAME} \
 # Key Techniques Involved 
 # Metadata-Driven Approach: (maintain config file for all models/tables, is_active is used to manage table)
 # Slowly Changing Dimensions (SCD) Type 2 Implementation: 
-# Common Data Model (CDM): 
-# Medallion Architecture (Bronze → Silver → Gold Layers): 
+# Common Data Model (CDM) (record added using surrogate key as primary key): 
+# Medallion Architecture (Bronze layer (raw_data) → Silver (cleaned data) → Gold Layers (aggregated data business KPIs data)): 
 # Logging and Monitoring:
 # Error Handling: 
 # CI/CD Implementation (Cloud Build Trigger): 
@@ -52,7 +52,7 @@ gcloud dataproc clusters create ${CLUSTER_NAME} \
 # BigQuery datasets and Tables (Datawarehouse)
 # Airflow Orchestration (DAG's)
 # Managed job dependencies using airflow
-# Star schema => Dimention Table, Fact Tables 
+# Star schema => Dimention Table (Upstream table), Fact Tables (Downstream table) 
 # Python
 # SQL
 # PySpark
@@ -60,7 +60,7 @@ gcloud dataproc clusters create ${CLUSTER_NAME} \
 # Delta Load = Only loading changed data since the last run.
 # Incremental load is similar to delta load — you load incremental changes, not the entire dataset.
 # Full Load
-# Loading data from multiple Datasources
+# Loading data from multiple Datasources (Cloud SQL MySQL, GCS json files, Local CSV files, Request API's)
 # Job scheduler using airflow
 # Landing Layer
 # Curated Layer
@@ -75,10 +75,38 @@ gcloud dataproc clusters create ${CLUSTER_NAME} \
 # PySpark Dataframe schema (StructType, StructField)
 # Load Bronze table data using external table instead of managed table (Create table)
 # GCP services used => BQ, Cloud SQL, GCS, Dataproc, Cloud Build, Cloud Composer
+# Surrogate key (Unique key generated internally, not from source system, generally used in SCD Type 2)
+# ------------------------------------------------------------------------------------------------------------
+# Fully prepare this health project, this will help, prepare SQL, Pyhton, Real time scenarios questions and answers document
+# --------------------------------------------------------------------------------------------------
+# Explain project in short
+# Requiremnt was to migrate from dbt to BQ, to create pipeline which run on daily basis to populate data on OLAP BQ datawarehouse
+# 1. Data Ingestion 
+# 2. Data storage
+# 3. Data Processing 
+# 4. Data Analysis
+# 5. Data pipeline 
+# 6. Data orchestration
+# 7. Data Visualization
+# 8. services used are: BQ, Cloud SQL, GCS, Dataproc, Cloud Build, Cloud Composer
 
 
-
-
+# Batch Data injestion to landing layer from multiple sources (Cloud SQL MySQL, GCS json files), it's a query based fetch to get fresh data
+# Before injestion move existing files to archive with date folder structure
+# Extract data using pyspark from Cloud SQL MySQL, incremental load using watermark column and last load timestamp from audit table in BQ
+# Save data to GCS landing in parquet format partitioned by load date
+# Load data to BQ from GCS using external table for bronze layer
+# Maintain event log for each step, save logs to GCS and BQ log table
+# Orchestrate entire workflow using Airflow DAG's with proper dependencies
+# Implement CI/CD using Cloud Build trigger on github repo commits
+# Documentation of entire project with architecture diagram, steps to recreate the setup, code explanation, challenges faced and future improvements
+# services used are: BQ, Cloud SQL, GCS, Dataproc, Cloud Build, Cloud Composer
+# ------------------------------------------------------------------------------------------------------------
+# How Do ETL Tools Handle Large Datasets? - The Friendly Statistician
+# 1. Selective extraction 
+# 2. Parallel processing
+# 3. Data Partitioning
+# 4. Scalable architecture
 
 # Data Fusion (Too heavy, takes more time to load, better pyspark, is more custimizable, to control) => No code ETL solution provided by google cloud, simply drag and drop UI based tool
 # Cloud Functions => Event based compute system, serverless, event driven, small code snipets
@@ -109,11 +137,6 @@ gcloud dataproc clusters create ${CLUSTER_NAME} \
 # https://www.youtube.com/watch?v=L4Ad7RQYv4o&list=PLLrA_pU9-Gz2DaQDcY5g9aYczmipBQ_Ek&index=7
 # MySQl => Datastream => BQ => Looker
 
-# How Do ETL Tools Handle Large Datasets? - The Friendly Statistician
-# 1. Selective extraction 
-# 2. Parallel processing
-# 3. Data Partitioning
-# 4. Scalable architecture
 
 # spark
 # 02 How Spark Works - Driver & Executors & Task | How Spark divide Job in Stages | What is Shuffle in Spark
@@ -136,3 +159,18 @@ gcloud dataproc clusters create ${CLUSTER_NAME} \
 
 # Metadata-Driven Approach, maintain config file for all models/tables, is_active is used to manage table
 # Slowly Changing Dimensions (SCD) Type 2 Implementation, take approval from client for full, incremental load tables
+# --------------------------------------------------------------------------------------------
+# vertical => union/unionall
+# horizontal => joins (most of time inner join, left join used)
+# --------------------------------------------------------------------------------------------
+# Distributed Computing
+# Parallel Computing
+# Cloud Computing
+# -------------------------------------------------------------------------------------------
+# Data Fusion => low priority
+# companies=> for batch job they preffer dataproc, for streaming job dataflow preferred
+# If you are using spark you should go for only dataproc
+# If you are using apache beam you should go for only dataflow
+# spark faster than apache beam
+# A batch job processes large volumes of data at once, usually based on a fixed schedule (hourly, daily, weekly).
+# A streaming job processes continuous data as soon as it arrives (near real-time or real-time).
