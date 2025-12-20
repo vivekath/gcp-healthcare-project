@@ -30,6 +30,7 @@ def pyspark_job(file_path, job_args=None):
         "pyspark_job": {
             "main_python_file_uri": file_path,
             "jar_file_uris": [BQ_JAR],
+            "python_file_uris": [f"gs://{COMPOSER_BUCKET}/data/common/common_lib.zip"]
         },
     }
     if job_args:

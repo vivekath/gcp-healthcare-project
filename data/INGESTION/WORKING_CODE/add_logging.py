@@ -8,6 +8,9 @@
 # use secretmanager to fetch sensitive information like db credentials
 # Use util common code for below types of tasks
 # Instead of json gcs can we use parquet for landing zone (performance optimization)
+# Make all variable/environment variables dynamic (no hardcoding) (DEV/UAT/PROD)
+# Common code utils for airflow + pyspark (read/write gcs, bq, logging
+# mentain json file file for constant of vairbales/env variables
 
 # Spark session creation
 # GCS read/write helpers

@@ -12,7 +12,8 @@ storage_client = storage.Client()
 bq_client = bigquery.Client()
 
 # Initialize Spark Session
-spark = SparkSession.builder.appName("HospitalAMySQLToLanding").getOrCreate()
+from common_lib.spark_utils import get_spark
+spark = get_spark("Healthcare_ETL_Job")
 
 # -------------------------
 # Argument parsing

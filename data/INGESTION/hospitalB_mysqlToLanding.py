@@ -11,7 +11,8 @@ import argparse
 storage_client = storage.Client()
 bq_client = bigquery.Client()
 
-spark = SparkSession.builder.appName("HospitalBMySQLToLanding").getOrCreate()
+from common_lib.spark_utils import get_spark
+spark = get_spark("Healthcare_ETL_Job")
 
 # -------------------------
 # Argument parsing
@@ -23,7 +24,7 @@ args = parser.parse_args()
 # Initialize Google Cloud Logging
 logging_client = google.cloud.logging.Client()
 logging_client.setup_logging()
-logger = logging.getLogger('hospital-a-data-pipeline')
+logger = logging.getLogger('hospital-b-data-pipeline')
 
 GCS_BUCKET = args.gcs_bucket
 HOSPITAL_NAME = "hospital-b"

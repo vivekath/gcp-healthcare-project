@@ -3,7 +3,8 @@ import argparse
 
 from pyspark.sql.functions import input_file_name, when
 
-spark = SparkSession.builder.appName("HospitalAMySQLToLanding").getOrCreate()
+from common_lib.spark_utils import get_spark
+spark = get_spark("Healthcare_ETL_Job")
 
 # -------------------------
 # Argument parsing
