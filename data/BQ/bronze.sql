@@ -4,6 +4,19 @@ OPTIONS (
   uris = ['gs://healthcare-bucket-20122025/landing/hospital-a/departments/*.json']
 );
 
+-- CREATE EXTERNAL TABLE IF NOT EXISTS `quantum-episode-345713.bronze_dataset.encounters_ha`
+-- (
+--   encounter_id INT64,
+--   patient_id INT64,
+--   provider_id INT64,
+--   encounter_date DATE,
+--   encounter_type STRING
+-- )
+-- OPTIONS (
+--   format = 'JSON',
+--   uris = ['gs://healthcare-bucket-20122025/landing/hospital-a/encounters/*.json']
+-- );
+
 CREATE EXTERNAL TABLE IF NOT EXISTS `quantum-episode-345713.bronze_dataset.encounters_ha` 
 OPTIONS (
   format = 'JSON',
