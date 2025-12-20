@@ -29,7 +29,7 @@ with DAG(
     # Task to trigger PySpark DAG
     trigger_pyspark_dag = TriggerDagRunOperator(
         task_id="trigger_pyspark_dag",
-        trigger_dag_id="pyspark_dag",
+        trigger_dag_id="pyspark_dag_param",
         wait_for_completion=True,
     )
 
