@@ -4,12 +4,18 @@ from pyspark.sql import SparkSession
 import datetime
 import json
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType,TimestampType
-
+import google.cloud.logging
+import logging
 
 storage_client = storage.Client()
 bq_client = bigquery.Client()
 
 spark = SparkSession.builder.appName("HospitalBMySQLToLanding").getOrCreate()
+
+# Initialize Google Cloud Logging
+logging_client = google.cloud.logging.Client()
+logging_client.setup_logging()
+logger = logging.getLogger('hospital-a-data-pipeline')
 
 GCS_BUCKET = "healthcare-bucket-20122025"
 HOSPITAL_NAME = "hospital-b"
@@ -31,6 +37,15 @@ MYSQL_CONFIG = {
 
 bucket = storage_client.bucket(GCS_BUCKET)
     
+# Logging helper function
+def log_pipeline_step(step, message, level='INFO'):
+    if level == 'INFO' or level == 'SUCCESS':
+        logger.info(f"Step: {step}, Message: {message}")
+    elif level == 'ERROR':
+        logger.error(f"Step: {step}, Error: {message}")
+    elif level == 'WARNING':
+        logger.warning(f"Step: {step}, Warning: {message}")
+
 log_entries = []
 
 def log_event(event_type, message, table=None):
@@ -41,6 +56,7 @@ def log_event(event_type, message, table=None):
         "table": table
     }
     log_entries.append(log_entry)
+    log_pipeline_step("Test Event Type", message, level=event_type)
     print(f"[{log_entry['timestamp']}] {event_type} - {message}")
     
 def read_config_file():

@@ -7,6 +7,7 @@
 # Use schema evaluation code as reference for pyspark job structure and logging
 # use secretmanager to fetch sensitive information like db credentials
 # Use util common code for below types of tasks
+# Instead of json gcs can we use parquet for landing zone (performance optimization)
 
 # Spark session creation
 # GCS read/write helpers

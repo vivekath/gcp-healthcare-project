@@ -8,13 +8,19 @@ from airflow.providers.google.cloud.operators.dataproc import (
     DataprocDeleteClusterOperator,
     ClusterGenerator
 )
+from airflow.models import Variable
 
-PROJECT_ID = "quantum-episode-345713"
-REGION = "us-east1"
-CLUSTER_NAME = "my-demo-cluster2"
-COMPOSER_BUCKET = "us-central1-demo-instance-708d54bc-bucket"
+PROJECT_ID = Variable.get("PROJECT_ID")
+REGION = Variable.get("REGION")
+COMPOSER_BUCKET = Variable.get("COMPOSER_BUCKET")
+CLUSTER_NAME = Variable.get("CLUSTER_NAME")
+BQ_JAR = Variable.get("BQ_JAR")
 
-BQ_JAR = "gs://spark-lib/bigquery/spark-bigquery-with-dependencies_2.12-0.36.1.jar"
+# PROJECT_ID = "quantum-episode-345713"
+# REGION = "us-east1"
+# CLUSTER_NAME = "my-demo-cluster2"
+# COMPOSER_BUCKET = "us-central1-demo-instance-708d54bc-bucket"
+# BQ_JAR = "gs://spark-lib/bigquery/spark-bigquery-with-dependencies_2.12-0.36.1.jar"
 
 def pyspark_job(file_path):
     return {
@@ -113,11 +119,6 @@ with DAG(
     )
 
     create_cluster >> task_1 >> task_2 >> task_3 >> task_4 >> stop_cluster >> delete_cluster
-
-# define the task dependencies
-# create_cluster >> pyspark_task_1 >> pyspark_task_2 >> pyspark_task_3 >> pyspark_task_4 >> stop_cluster >> delete_cluster
-# pyspark_task_1 >> pyspark_task_2 >> pyspark_task_3 >> pyspark_task_4
-# create_cluster >> start_cluster >> pyspark_task_1 >> pyspark_task_2 >> pyspark_task_3 >> pyspark_task_4 >> stop_cluster >> delete_cluster
 
 # ✅ Recommended Cluster Configuration for 100M rows/day
 """
