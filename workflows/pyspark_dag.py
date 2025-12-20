@@ -16,7 +16,7 @@ from airflow.providers.google.cloud.operators.dataproc import (
 PROJECT_ID = "quantum-episode-345713"
 REGION = "us-east1"
 CLUSTER_NAME = "my-demo-cluster2"
-COMPOSER_BUCKET = "us-central1-demo-instance-5429be73-bucket"
+COMPOSER_BUCKET = "us-central1-demo-instance-708d54bc-bucket"
 
 GCS_JOB_FILE_1 = f"gs://{COMPOSER_BUCKET}/data/INGESTION/hospitalA_mysqlToLanding.py"
 PYSPARK_JOB_1 = {
@@ -88,13 +88,13 @@ with DAG(
     tags=["pyspark", "dataproc", "etl", "marvel"]
 ) as dag:
     
-    # create_cluster = DataprocCreateClusterOperator(
-    #     task_id="create_cluster",
-    #     project_id=PROJECT_ID,
-    #     cluster_config=CLUSTER_CONFIG,
-    #     region=REGION,
-    #     cluster_name=CLUSTER_NAME,
-    # )
+    create_cluster = DataprocCreateClusterOperator(
+        task_id="create_cluster",
+        project_id=PROJECT_ID,
+        cluster_config=CLUSTER_CONFIG,
+        region=REGION,
+        cluster_name=CLUSTER_NAME,
+    )
         
     # define the Tasks
     start_cluster = DataprocStartClusterOperator(
@@ -139,17 +139,17 @@ with DAG(
         cluster_name=CLUSTER_NAME,
     )
 
-    # delete_cluster = DataprocDeleteClusterOperator(
-    #     task_id="delete_cluster", 
-    #     project_id=PROJECT_ID, 
-    #     cluster_name=CLUSTER_NAME, 
-    #     region=REGION,
-    # )
+    delete_cluster = DataprocDeleteClusterOperator(
+        task_id="delete_cluster", 
+        project_id=PROJECT_ID, 
+        cluster_name=CLUSTER_NAME, 
+        region=REGION,
+    )
 
 # define the task dependencies
-start_cluster >> pyspark_task_1 >> pyspark_task_2 >> pyspark_task_3 >> pyspark_task_4 >> stop_cluster
+# start_cluster >> pyspark_task_1 >> pyspark_task_2 >> pyspark_task_3 >> pyspark_task_4 >> stop_cluster
 # start_cluster >> pyspark_task_2 >> pyspark_task_3 >> pyspark_task_4 >> stop_cluster
-# create_cluster >> pyspark_task_1 >> pyspark_task_2 >> pyspark_task_3 >> pyspark_task_4 >> delete_cluster
+create_cluster >> start_cluster >> pyspark_task_1 >> pyspark_task_2 >> pyspark_task_3 >> pyspark_task_4 >> stop_cluster >> delete_cluster
 
 # ✅ Recommended Cluster Configuration for 100M rows/day
 """
@@ -196,4 +196,124 @@ CLUSTER_CONFIG = ClusterGenerator(
     )
 
 ).make()
+"""
+
+"""
+2️⃣ Pass environment values using Dataproc job properties
+
+Instead of hardcoding:
+
+GCS_BUCKET = "heathcare-bucket-12112025"
+BQ_PROJECT = "quantum-episode-345713"
+
+🔹 Use environment variables
+Modify your PySpark job submission
+PYSPARK_JOB_1 = {
+    "reference": {"project_id": PROJECT_ID},
+    "placement": {"cluster_name": CLUSTER_NAME},
+    "pyspark_job": {
+        "main_python_file_uri": GCS_JOB_FILE_1,
+        "properties": {
+            "spark.executorEnv.GCS_BUCKET": "heathcare-bucket-12112025",
+            "spark.executorEnv.BQ_PROJECT": "quantum-episode-345713",
+            "spark.executorEnv.HOSPITAL_NAME": "hospital-a"
+        }
+    }
+}
+
+3️⃣ Read env variables inside your PySpark code
+
+Update hospitalA_mysqlToLanding.py:
+
+import os
+
+GCS_BUCKET = os.getenv("GCS_BUCKET")
+BQ_PROJECT = os.getenv("BQ_PROJECT")
+HOSPITAL_NAME = os.getenv("HOSPITAL_NAME")
+
+
+Then reuse everywhere:
+
+LANDING_PATH = f"gs://{GCS_BUCKET}/landing/{HOSPITAL_NAME}/"
+ARCHIVE_PATH = f"gs://{GCS_BUCKET}/landing/{HOSPITAL_NAME}/archive/"
+
+
+✔ No hardcoding
+✔ Different environments (dev/qa/prod) supported
+✔ Same job runs everywhere
+
+4️⃣ Even better: Use Composer Variables (Recommended)
+
+Since you are using Cloud Composer, this is cleaner.
+
+In Composer UI:
+Admin → Variables
+
+
+Add:
+
+GCS_BUCKET = heathcare-bucket-12112025
+BQ_PROJECT = quantum-episode-345713
+HOSPITAL_NAME = hospital-a
+
+Pass them into Dataproc job dynamically
+from airflow.models import Variable
+
+PYSPARK_JOB_1 = {
+    "reference": {"project_id": PROJECT_ID},
+    "placement": {"cluster_name": CLUSTER_NAME},
+    "pyspark_job": {
+        "main_python_file_uri": GCS_JOB_FILE_1,
+        "properties": {
+            "spark.executorEnv.GCS_BUCKET": Variable.get("GCS_BUCKET"),
+            "spark.executorEnv.BQ_PROJECT": Variable.get("BQ_PROJECT"),
+            "spark.executorEnv.HOSPITAL_NAME": Variable.get("HOSPITAL_NAME")
+        }
+    }
+}
+
+
+👉 This is how production pipelines are done
+"""
+
+"""
+✅ How to read these variables in your DAG / PySpark code
+In Airflow DAG
+from airflow.models import Variable
+
+GCS_BUCKET = Variable.get("GCS_BUCKET")
+BQ_PROJECT = Variable.get("BQ_PROJECT")
+HOSPITAL_NAME = Variable.get("HOSPITAL_NAME")
+
+In PySpark job (Dataproc Serverless / Cluster)
+
+You have two correct options:
+
+Option 1️⃣ Pass as job arguments (BEST PRACTICE)
+
+In DAG:
+
+job=build_pyspark_job(
+    f"gs://{COMPOSER_BUCKET}/data/INGESTION/hospitalA_mysqlToLanding.py",
+    args=[
+        f"--gcs_bucket={Variable.get('GCS_BUCKET')}",
+        f"--bq_project={Variable.get('BQ_PROJECT')}",
+        f"--hospital_name={Variable.get('HOSPITAL_NAME')}"
+    ]
+)
+
+
+In PySpark:
+
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument("--gcs_bucket")
+parser.add_argument("--bq_project")
+parser.add_argument("--hospital_name")
+args = parser.parse_args()
+
+GCS_BUCKET = args.gcs_bucket
+BQ_PROJECT = args.bq_project
+HOSPITAL_NAME = args.hospital_name
 """

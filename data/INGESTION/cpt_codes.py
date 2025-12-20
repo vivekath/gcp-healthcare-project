@@ -1,7 +1,7 @@
 from pyspark.sql import SparkSession
 spark = SparkSession.builder.appName("HospitalAMySQLToLanding").getOrCreate()
 
-GCS_BUCKET = "heathcare-bucket-12112025"
+GCS_BUCKET = "healthcare-bucket-20122025"
 CPT_BUCKET_PATH = f"gs://{GCS_BUCKET}/landing/cptcodes/*.csv"
 BQ_PROJECT = "quantum-episode-345713"
 BQ_TABLE = f"{BQ_PROJECT}.bronze_dataset.cpt_codes"

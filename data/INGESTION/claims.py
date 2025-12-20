@@ -3,7 +3,7 @@ from pyspark.sql.functions import input_file_name, when
 
 spark = SparkSession.builder.appName("HospitalAMySQLToLanding").getOrCreate()
 
-GCS_BUCKET = "heathcare-bucket-12112025"
+GCS_BUCKET = "healthcare-bucket-20122025"
 CLAIMS_BUCKET_PATH = f"gs://{GCS_BUCKET}/landing/claims/*.csv"
 BQ_PROJECT = "quantum-episode-345713"
 BQ_TABLE = f"{BQ_PROJECT}.bronze_dataset.claims"

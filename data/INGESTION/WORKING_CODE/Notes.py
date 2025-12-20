@@ -13,7 +13,30 @@ gcloud dataproc clusters create ${CLUSTER_NAME} \
   --optional-components=JUPYTER \
   --initialization-actions=gs://goog-dataproc-initialization-actions-${REGION}/connectors/connectors.sh \
   --metadata bigquery-connector-version=1.2.0,spark-bigquery-connector-version=0.21.0
+# -------------------------------------------------------------------------------
+CLUSTER_NAME="my-demo-cluster2"
+REGION="us-east1"
+
+gcloud dataproc clusters create ${CLUSTER_NAME} \
+  --region=${REGION} \
+  --num-workers=0 \
+  --master-machine-type=n1-standard-2 \
+  --master-boot-disk-size=50 \
+  --image-version=2.0-debian10 \
+  --enable-component-gateway \
+  --optional-components=JUPYTER \
+  --initialization-actions=gs://goog-dataproc-initialization-actions-${REGION}/connectors/connectors.sh \
+  --metadata bigquery-connector-version=1.2.0,spark-bigquery-connector-version=0.21.0
 # ------------------------------------------------------------------------------
+# Cheapest Dataproc setup (VERY IMPORTANT)
+# Single-node cluster (learning/dev)
+gcloud dataproc clusters create dev-single-node \
+  --region=us-central1 \
+  --num-workers=0 \
+  --master-machine-type=e2-standard-2 \
+  --master-boot-disk-size=30 \
+  --image-version=2.0-debian10
+# --------------------------------------------------------------------------------------------
 # Prerequisites, created quantum-episode-345713:temp_dataset.audit_log => Used in inittail query
 # Remove columns name from csv file while uploading
 # Mentioned schema explicitly while creation spark dataframe
@@ -174,3 +197,80 @@ gcloud dataproc clusters create ${CLUSTER_NAME} \
 # spark faster than apache beam
 # A batch job processes large volumes of data at once, usually based on a fixed schedule (hourly, daily, weekly).
 # A streaming job processes continuous data as soon as it arrives (near real-time or real-time).
+# -------------------------------------------------------------------------------------------
+🧠 Split your work into 3 layers
+1️⃣ Logic development (FREE / very cheap)
+Where:
+Google Colab
+Local PySpark
+Small sample data (local files)
+What you do:
+Transformations
+Joins
+Filters
+Aggregations
+Window functions
+spark.read.csv("/content/sample.csv")
+✔ No Dataproc
+✔ Zero or near-zero cost
+
+2️⃣ Integration testing (SHORT Dataproc usage)
+Where:
+Single-node Dataproc
+What you test:
+gs:// reads/writes
+BigQuery connectors
+Real schema
+Performance sanity
+⏱ Run for 10–30 minutes only
+💰 Cost: ₹10–₹30 per run (approx)
+
+3️⃣ Production runs
+Where:
+Scheduled Dataproc jobs
+Composer / Airflow
+# --------------------------Check initial tutorial how to use pyspark locally---------------------------------
+Use Colab / local Spark for daily learning  
+Spin up single-node Dataproc only when needed
+Delete cluster immediately after testing
+# -----------------------------------------------------------
+# firts take 20% of data to local system
+# do all development and testing on local system
+# once everything is done move to cloud dataproc
+# create dataproc cluster
+# -----------------------------------------------------------
+# Identify data sources 
+# Understand data volume and velocity
+# Choose between batch and stream processing
+# Design data ingestion pipelines
+# Set up data storage solutions
+# Implement data processing workflows
+# Establish data governance and security measures
+# Monitor and optimize performance
+# Plan for scalability and future growth
+# Ensure cost-effectiveness
+# Document the architecture and processes
+# Train the team on the new system
+# Continuously review and improve the data engineering practices
+# Stay updated with the latest technologies and trends in data engineering
+# Collaborate with stakeholders to align data strategies with business goals
+# -----------------------------------------------------------
+# Fisrt setup everything on local system using pyspark
+# once everything is done move to cloud dataproc  
+# create dataproc cluster
+# -----------------------------------------------------------
+# setup pyspark on local system
+# setup GCP SDK on local system
+# authenticate GCP account using gcloud auth login
+# setup service account and download json key file
+# -------------------------------------------111111--------------------------------
+# First test everyhtong on local system using pyspark with limited data
+# once everything is done move to cloud dataproc
+# Now increase volume of data to test performance on local as well on cloud dataproc (check required configurations for data volume)
+# check for improvements in code to optimize performance
+# Again increase volume of data to test performance on local as well on cloud dataproc (check required configurations for data volume)
+# once everything is done schedule job using airflow on cloud composer
+# In short finalize everything on local system using pyspark  
+# once everything is done move to cloud dataproc
+# In short first set the required logic with small data (20%,30%) on local system using pyspark then, then scale up and do configurations on cloud dataproc with full data   
+# -------------------------------------------
