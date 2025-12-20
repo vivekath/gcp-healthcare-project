@@ -88,21 +88,21 @@ with DAG(
     tags=["pyspark", "dataproc", "etl", "marvel"]
 ) as dag:
     
-    create_cluster = DataprocCreateClusterOperator(
-        task_id="create_cluster",
-        project_id=PROJECT_ID,
-        cluster_config=CLUSTER_CONFIG,
-        region=REGION,
-        cluster_name=CLUSTER_NAME,
-    )
+    # create_cluster = DataprocCreateClusterOperator(
+    #     task_id="create_cluster",
+    #     project_id=PROJECT_ID,
+    #     cluster_config=CLUSTER_CONFIG,
+    #     region=REGION,
+    #     cluster_name=CLUSTER_NAME,
+    # )
         
     # define the Tasks
-    start_cluster = DataprocStartClusterOperator(
-        task_id="start_cluster",
-        project_id=PROJECT_ID,
-        region=REGION,
-        cluster_name=CLUSTER_NAME,
-    )
+    # start_cluster = DataprocStartClusterOperator(
+    #     task_id="start_cluster",
+    #     project_id=PROJECT_ID,
+    #     region=REGION,
+    #     cluster_name=CLUSTER_NAME,
+    # )
 
     pyspark_task_1 = DataprocSubmitJobOperator(
         task_id="pyspark_task_1", 
@@ -132,24 +132,24 @@ with DAG(
         project_id=PROJECT_ID
     )
 
-    stop_cluster = DataprocStopClusterOperator(
-        task_id="stop_cluster",
-        project_id=PROJECT_ID,
-        region=REGION,
-        cluster_name=CLUSTER_NAME,
-    )
+    # stop_cluster = DataprocStopClusterOperator(
+    #     task_id="stop_cluster",
+    #     project_id=PROJECT_ID,
+    #     region=REGION,
+    #     cluster_name=CLUSTER_NAME,
+    # )
 
-    delete_cluster = DataprocDeleteClusterOperator(
-        task_id="delete_cluster", 
-        project_id=PROJECT_ID, 
-        cluster_name=CLUSTER_NAME, 
-        region=REGION,
-    )
+    # delete_cluster = DataprocDeleteClusterOperator(
+    #     task_id="delete_cluster", 
+    #     project_id=PROJECT_ID, 
+    #     cluster_name=CLUSTER_NAME, 
+    #     region=REGION,
+    # )
 
 # define the task dependencies
 # start_cluster >> pyspark_task_1 >> pyspark_task_2 >> pyspark_task_3 >> pyspark_task_4 >> stop_cluster
-# start_cluster >> pyspark_task_2 >> pyspark_task_3 >> pyspark_task_4 >> stop_cluster
-create_cluster >> start_cluster >> pyspark_task_1 >> pyspark_task_2 >> pyspark_task_3 >> pyspark_task_4 >> stop_cluster >> delete_cluster
+pyspark_task_1 >> pyspark_task_2 >> pyspark_task_3 >> pyspark_task_4
+# create_cluster >> start_cluster >> pyspark_task_1 >> pyspark_task_2 >> pyspark_task_3 >> pyspark_task_4 >> stop_cluster >> delete_cluster
 
 # ✅ Recommended Cluster Configuration for 100M rows/day
 """
