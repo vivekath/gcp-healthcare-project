@@ -62,8 +62,8 @@ CLUSTER_CONFIG = ClusterGenerator(
         f"gs://goog-dataproc-initialization-actions-us-east1/connectors/connectors.sh"
     ],
     metadata={
-        "bigquery-connector-version": "1.2.0",
-        "spark-bigquery-connector-version": "0.21.0",
+        # "bigquery-connector-version": "1.2.0",
+        "spark-bigquery-connector-version": "0.36.1"
     }
 ).make()
 
