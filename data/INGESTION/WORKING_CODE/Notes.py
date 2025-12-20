@@ -274,3 +274,50 @@ Delete cluster immediately after testing
 # once everything is done move to cloud dataproc
 # In short first set the required logic with small data (20%,30%) on local system using pyspark then, then scale up and do configurations on cloud dataproc with full data   
 # -------------------------------------------
+# I am using GCS, Bigquery, dataproc cluster, composer. cloud build
+# How to set set location of all
+
+"""
+Keep everything in the SAME REGION (or compatible multi-region)
+
+Below is a clear, practical guide for setting location service-by-service, plus a recommended architecture for your setup.
+
+🔑 Golden Rule (Very Important)
+Service	Location Rule
+BigQuery	Dataset location must match job location
+Dataproc	Cluster region ≈ GCS bucket region
+Composer	Environment region ≈ Dataproc region
+Cloud Build	Global (no issue)
+GCS	Bucket location must match compute
+"""
+
+"""
+✅ Recommended Setup for Your Use Case (India)
+
+Since you already hit asia-south1 vs US issues, this is the best practice:
+
+✅ Single Region Architecture
+Region: asia-south1 (Mumbai)
+
+Service	Location
+GCS Buckets	asia-south1
+BigQuery Datasets	asia-south1
+Dataproc Cluster	asia-south1
+Composer Environment	asia-south1
+Cloud Build	Global (OK)
+"""
+# ---------------------------------------------------------------------------
+# Bronze, silver, gold where to to partaion and clustring ?
+🥉🥈🥇 Where to use Partitioning & Clustering
+TL;DR (Golden Rule)
+Layer	Storage	Partition	Cluster
+Bronze	GCS / External table	❌ NO	❌ NO
+Silver	BigQuery native table	✅ YES	⚠️ Optional
+Gold	BigQuery native table	✅ YES	✅ YES
+# ----------------------------------------------------------------------------
+📌 Final Architecture
+Dataproc → GCS (Parquet)
+GCS → External Table (Bronze)
+Bronze → Silver (Partitioned)
+Silver → Gold (Partitioned + Clustered)
+# ----------------------------------------------------------------------------

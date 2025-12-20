@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS `quantum-episode-345713.silver_dataset.DIM_PATIENTS` 
     inserted_date TIMESTAMP,
     modified_date TIMESTAMP,
     is_current BOOL
-);
+) PARTITION BY DATE(inserted_date);
 create or replace table `quantum-episode-345713.silver_dataset.quality_checks` as
 select distinct 
 CONCAT(SRC_PatientID, '-', datasource) AS Patient_Key,
@@ -218,7 +218,7 @@ CREATE TABLE IF NOT EXISTS `quantum-episode-345713.silver_dataset.DIM_TRANSACTIO
     inserted_date TIMESTAMP,
     modified_date TIMESTAMP,
     is_current BOOL
-);
+) PARTITION BY DATE(inserted_date);
 
 -- 2. Create a quality_checks temp table
 CREATE OR REPLACE TABLE `quantum-episode-345713.silver_dataset.quality_checks` AS
@@ -372,7 +372,7 @@ CREATE TABLE IF NOT EXISTS `quantum-episode-345713.silver_dataset.DIM_ENCOUNTERS
     inserted_date TIMESTAMP,
     modified_date TIMESTAMP,
     is_current BOOL
-);
+) PARTITION BY DATE(inserted_date);
 
 -- 2. Create a quality_checks temp table for encounters
 CREATE OR REPLACE TABLE `quantum-episode-345713.silver_dataset.quality_checks_encounters` AS
@@ -506,7 +506,7 @@ CREATE TABLE IF NOT EXISTS `quantum-episode-345713.silver_dataset.DIM_CLAIMS` (
     inserted_date TIMESTAMP,
     modified_date TIMESTAMP,
     is_current BOOLEAN
-);
+) PARTITION BY DATE(inserted_date);
 
 -- 2. Create a quality_checks temp table for claims
 CREATE OR REPLACE TABLE `quantum-episode-345713.silver_dataset.quality_checks_claims` AS
@@ -660,7 +660,7 @@ CREATE TABLE IF NOT EXISTS `quantum-episode-345713.silver_dataset.DIM_CPT_CODES`
     inserted_date TIMESTAMP,
     modified_date TIMESTAMP,
     is_current BOOLEAN
-);
+) PARTITION BY DATE(inserted_date);
 
 -- 2. Create a quality_checks temp table for CP Codes
 CREATE OR REPLACE TABLE `quantum-episode-345713.silver_dataset.quality_checks_cpt_codes` AS
