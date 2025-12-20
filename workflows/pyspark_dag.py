@@ -6,7 +6,8 @@ from airflow.providers.google.cloud.operators.dataproc import (
     DataprocSubmitJobOperator,
     DataprocStopClusterOperator,
     DataprocDeleteClusterOperator,
-    ClusterGenerator
+    ClusterGenerator,
+    DataprocStartClusterOperator
 )
 from airflow.models import Variable
 
@@ -90,6 +91,14 @@ with DAG(
         region=REGION,
         cluster_name=CLUSTER_NAME,
     )
+
+    #     # define the Tasks
+    # start_cluster = DataprocStartClusterOperator(
+    #     task_id="start_cluster",
+    #     project_id=PROJECT_ID,
+    #     region=REGION,
+    #     cluster_name=CLUSTER_NAME,
+    # )
 
     # Hospital A ingestion
     task_1 = DataprocSubmitJobOperator(

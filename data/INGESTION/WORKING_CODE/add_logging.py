@@ -11,6 +11,9 @@
 # Make all variable/environment variables dynamic (no hardcoding) (DEV/UAT/PROD)
 # Common code utils for airflow + pyspark (read/write gcs, bq, logging
 # mentain json file file for constant of vairbales/env variables
+# remove all string, add them in constant file and read from there
+# use common code for logging in pyspark and airflow both
+# add all, these points and check again how can we optimize from real time scenario
 
 # Spark session creation
 # GCS read/write helpers

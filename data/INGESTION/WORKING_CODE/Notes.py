@@ -321,3 +321,12 @@ GCS → External Table (Bronze)
 Bronze → Silver (Partitioned)
 Silver → Gold (Partitioned + Clustered)
 # ----------------------------------------------------------------------------
+# How dataproc_serverless_pyspark_etl differs from below
+1️⃣ High-level difference (one-line answer)
+Aspect	Dataproc Serverless PySpark	Your Dataproc Cluster DAG
+Infrastructure	Fully managed (no cluster)	You manage cluster lifecycle
+Cluster creation	❌ Not required	✅ Required
+Cost model	Pay per job (seconds)	Pay per VM uptime
+Startup time	Faster	Slower (cluster spin-up)
+Ops effort	Very low	High
+Control	Limited	Full control
