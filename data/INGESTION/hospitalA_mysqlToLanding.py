@@ -5,6 +5,7 @@ import datetime
 import json
 import google.cloud.logging
 import logging
+import argparse
 
 # Initialize GCS & BigQuery Clients
 storage_client = storage.Client()
@@ -13,13 +14,20 @@ bq_client = bigquery.Client()
 # Initialize Spark Session
 spark = SparkSession.builder.appName("HospitalAMySQLToLanding").getOrCreate()
 
+# -------------------------
+# Argument parsing
+# -------------------------
+parser = argparse.ArgumentParser()
+parser.add_argument("--gcs_bucket", required=True, help="GCS bucket name")
+args = parser.parse_args()
+
 # Initialize Google Cloud Logging
 logging_client = google.cloud.logging.Client()
 logging_client.setup_logging()
 logger = logging.getLogger('hospital-a-data-pipeline')
 
 # Google Cloud Storage (GCS) Configuration
-GCS_BUCKET = "healthcare-bucket-20122025"
+GCS_BUCKET = args.gcs_bucket
 HOSPITAL_NAME = "hospital-a"
 LANDING_PATH = f"gs://{GCS_BUCKET}/landing/{HOSPITAL_NAME}/"
 ARCHIVE_PATH = f"gs://{GCS_BUCKET}/landing/{HOSPITAL_NAME}/archive/"

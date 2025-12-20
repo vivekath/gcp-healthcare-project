@@ -6,18 +6,26 @@ import json
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType,TimestampType
 import google.cloud.logging
 import logging
+import argparse
 
 storage_client = storage.Client()
 bq_client = bigquery.Client()
 
 spark = SparkSession.builder.appName("HospitalBMySQLToLanding").getOrCreate()
 
+# -------------------------
+# Argument parsing
+# -------------------------
+parser = argparse.ArgumentParser()
+parser.add_argument("--gcs_bucket", required=True, help="GCS bucket name")
+args = parser.parse_args()
+
 # Initialize Google Cloud Logging
 logging_client = google.cloud.logging.Client()
 logging_client.setup_logging()
 logger = logging.getLogger('hospital-a-data-pipeline')
 
-GCS_BUCKET = "healthcare-bucket-20122025"
+GCS_BUCKET = args.gcs_bucket
 HOSPITAL_NAME = "hospital-b"
 LANDING_PATH = f"gs://{GCS_BUCKET}/landing/{HOSPITAL_NAME}/"
 ARCHIVE_PATH = f"gs://{GCS_BUCKET}/landing/{HOSPITAL_NAME}/archive/"
