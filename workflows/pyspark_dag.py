@@ -1,50 +1,30 @@
-# import all modules
-import airflow
 from airflow import DAG
 from datetime import timedelta
 from airflow.utils.dates import days_ago
 from airflow.providers.google.cloud.operators.dataproc import (
-    DataprocStartClusterOperator,
-    DataprocStopClusterOperator,
-    DataprocSubmitJobOperator,
     DataprocCreateClusterOperator,
+    DataprocSubmitJobOperator,
+    DataprocStopClusterOperator,
     DataprocDeleteClusterOperator,
     ClusterGenerator
 )
 
-# define the variables
 PROJECT_ID = "quantum-episode-345713"
 REGION = "us-east1"
 CLUSTER_NAME = "my-demo-cluster2"
 COMPOSER_BUCKET = "us-central1-demo-instance-708d54bc-bucket"
 
-GCS_JOB_FILE_1 = f"gs://{COMPOSER_BUCKET}/data/INGESTION/hospitalA_mysqlToLanding.py"
-PYSPARK_JOB_1 = {
-    "reference": {"project_id": PROJECT_ID},
-    "placement": {"cluster_name": CLUSTER_NAME},
-    "pyspark_job": {"main_python_file_uri": GCS_JOB_FILE_1},
-}
+BQ_JAR = "gs://spark-lib/bigquery/spark-bigquery-with-dependencies_2.12-0.36.1.jar"
 
-GCS_JOB_FILE_2 = f"gs://{COMPOSER_BUCKET}/data/INGESTION/hospitalB_mysqlToLanding.py"
-PYSPARK_JOB_2 = {
-    "reference": {"project_id": PROJECT_ID},
-    "placement": {"cluster_name": CLUSTER_NAME},
-    "pyspark_job": {"main_python_file_uri": GCS_JOB_FILE_2},
-}
-
-GCS_JOB_FILE_3 = f"gs://{COMPOSER_BUCKET}/data/INGESTION/claims.py"
-PYSPARK_JOB_3 = {
-    "reference": {"project_id": PROJECT_ID},
-    "placement": {"cluster_name": CLUSTER_NAME},
-    "pyspark_job": {"main_python_file_uri": GCS_JOB_FILE_3},
-}
-
-GCS_JOB_FILE_4 = f"gs://{COMPOSER_BUCKET}/data/INGESTION/cpt_codes.py"
-PYSPARK_JOB_4 = {
-    "reference": {"project_id": PROJECT_ID},
-    "placement": {"cluster_name": CLUSTER_NAME},
-    "pyspark_job": {"main_python_file_uri": GCS_JOB_FILE_4},
-}
+def pyspark_job(file_path):
+    return {
+        "reference": {"project_id": PROJECT_ID},
+        "placement": {"cluster_name": CLUSTER_NAME},
+        "pyspark_job": {
+            "main_python_file_uri": file_path,
+            "jar_file_uris": [BQ_JAR],
+        },
+    }
 
 CLUSTER_CONFIG = ClusterGenerator(
     project_id=PROJECT_ID,
@@ -67,26 +47,21 @@ CLUSTER_CONFIG = ClusterGenerator(
 ).make()
 
 ARGS = {
-    "owner": "VIVEK ATHILKAR",
+    "owner": "vivek_athilkar",
     "start_date": days_ago(1),
     "depends_on_past": False,
-    "email_on_failure": False,
-    "email_on_retry": False,
-    "email": ["vivekneosoft@gmail.com"],
-    "email_on_success": False,
     "retries": 1,
-    "retry_delay": timedelta(minutes=5)
+    "retry_delay": timedelta(minutes=5),
 }
 
-# define the dag
 with DAG(
     dag_id="pyspark_dag",
-    schedule_interval=None,
-    description="DAG to start a Dataproc cluster, run PySpark jobs, and stop the cluster",
     default_args=ARGS,
-    tags=["pyspark", "dataproc", "etl", "marvel"]
+    schedule_interval=None,
+    catchup=False,
+    tags=["pyspark", "dataproc", "etl"]
 ) as dag:
-    
+
     create_cluster = DataprocCreateClusterOperator(
         task_id="create_cluster",
         project_id=PROJECT_ID,
@@ -94,41 +69,33 @@ with DAG(
         region=REGION,
         cluster_name=CLUSTER_NAME,
     )
-        
-    # # define the Tasks
-    # start_cluster = DataprocStartClusterOperator(
-    #     task_id="start_cluster",
-    #     project_id=PROJECT_ID,
-    #     region=REGION,
-    #     cluster_name=CLUSTER_NAME,
-    # )
 
-    pyspark_task_1 = DataprocSubmitJobOperator(
-        task_id="pyspark_task_1", 
-        job=PYSPARK_JOB_1, 
-        region=REGION, 
-        project_id=PROJECT_ID
+    task_1 = DataprocSubmitJobOperator(
+        task_id="hospitalA_ingestion",
+        job=pyspark_job(f"gs://{COMPOSER_BUCKET}/data/INGESTION/hospitalA_mysqlToLanding.py"),
+        region=REGION,
+        project_id=PROJECT_ID,
     )
 
-    pyspark_task_2 = DataprocSubmitJobOperator(
-        task_id="pyspark_task_2", 
-        job=PYSPARK_JOB_2, 
-        region=REGION, 
-        project_id=PROJECT_ID
+    task_2 = DataprocSubmitJobOperator(
+        task_id="hospitalB_ingestion",
+        job=pyspark_job(f"gs://{COMPOSER_BUCKET}/data/INGESTION/hospitalB_mysqlToLanding.py"),
+        region=REGION,
+        project_id=PROJECT_ID,
     )
 
-    pyspark_task_3 = DataprocSubmitJobOperator(
-        task_id="pyspark_task_3", 
-        job=PYSPARK_JOB_3, 
-        region=REGION, 
-        project_id=PROJECT_ID
+    task_3 = DataprocSubmitJobOperator(
+        task_id="claims_ingestion",
+        job=pyspark_job(f"gs://{COMPOSER_BUCKET}/data/INGESTION/claims.py"),
+        region=REGION,
+        project_id=PROJECT_ID,
     )
 
-    pyspark_task_4 = DataprocSubmitJobOperator(
-        task_id="pyspark_task_4", 
-        job=PYSPARK_JOB_4, 
-        region=REGION, 
-        project_id=PROJECT_ID
+    task_4 = DataprocSubmitJobOperator(
+        task_id="cpt_codes_ingestion",
+        job=pyspark_job(f"gs://{COMPOSER_BUCKET}/data/INGESTION/cpt_codes.py"),
+        region=REGION,
+        project_id=PROJECT_ID,
     )
 
     stop_cluster = DataprocStopClusterOperator(
@@ -139,14 +106,16 @@ with DAG(
     )
 
     delete_cluster = DataprocDeleteClusterOperator(
-        task_id="delete_cluster", 
-        project_id=PROJECT_ID, 
-        cluster_name=CLUSTER_NAME, 
+        task_id="delete_cluster",
+        project_id=PROJECT_ID,
         region=REGION,
+        cluster_name=CLUSTER_NAME,
     )
 
+    create_cluster >> task_1 >> task_2 >> task_3 >> task_4 >> stop_cluster >> delete_cluster
+
 # define the task dependencies
-create_cluster >> pyspark_task_1 >> pyspark_task_2 >> pyspark_task_3 >> pyspark_task_4 >> stop_cluster >> delete_cluster
+# create_cluster >> pyspark_task_1 >> pyspark_task_2 >> pyspark_task_3 >> pyspark_task_4 >> stop_cluster >> delete_cluster
 # pyspark_task_1 >> pyspark_task_2 >> pyspark_task_3 >> pyspark_task_4
 # create_cluster >> start_cluster >> pyspark_task_1 >> pyspark_task_2 >> pyspark_task_3 >> pyspark_task_4 >> stop_cluster >> delete_cluster
 
