@@ -59,10 +59,9 @@ CLUSTER_CONFIG = ClusterGenerator(
     optional_components=["JUPYTER"],
     enable_component_gateway=True,
     initialization_actions=[
-        f"gs://goog-dataproc-initialization-actions-us-east1/connectors/connectors.sh"
+        "gs://goog-dataproc-initialization-actions/connectors/connectors.sh"
     ],
     metadata={
-        # "bigquery-connector-version": "1.2.0",
         "spark-bigquery-connector-version": "0.36.1"
     }
 ).make()
@@ -88,13 +87,13 @@ with DAG(
     tags=["pyspark", "dataproc", "etl", "marvel"]
 ) as dag:
     
-    # create_cluster = DataprocCreateClusterOperator(
-    #     task_id="create_cluster",
-    #     project_id=PROJECT_ID,
-    #     cluster_config=CLUSTER_CONFIG,
-    #     region=REGION,
-    #     cluster_name=CLUSTER_NAME,
-    # )
+    create_cluster = DataprocCreateClusterOperator(
+        task_id="create_cluster",
+        project_id=PROJECT_ID,
+        cluster_config=CLUSTER_CONFIG,
+        region=REGION,
+        cluster_name=CLUSTER_NAME,
+    )
         
     # define the Tasks
     start_cluster = DataprocStartClusterOperator(
@@ -147,7 +146,7 @@ with DAG(
     )
 
 # define the task dependencies
-start_cluster >> pyspark_task_1 >> pyspark_task_2 >> pyspark_task_3 >> pyspark_task_4 >> stop_cluster >> delete_cluster
+create_cluster >> start_cluster >> pyspark_task_1 >> pyspark_task_2 >> pyspark_task_3 >> pyspark_task_4 >> stop_cluster >> delete_cluster
 # pyspark_task_1 >> pyspark_task_2 >> pyspark_task_3 >> pyspark_task_4
 # create_cluster >> start_cluster >> pyspark_task_1 >> pyspark_task_2 >> pyspark_task_3 >> pyspark_task_4 >> stop_cluster >> delete_cluster
 
