@@ -68,7 +68,7 @@ CLUSTER_CONFIG = ClusterGenerator(
 
 ARGS = {
     "owner": "VIVEK ATHILKAR",
-    "start_date": None,
+    "start_date": days_ago(1),
     "depends_on_past": False,
     "email_on_failure": False,
     "email_on_retry": False,
@@ -95,13 +95,13 @@ with DAG(
         cluster_name=CLUSTER_NAME,
     )
         
-    # define the Tasks
-    start_cluster = DataprocStartClusterOperator(
-        task_id="start_cluster",
-        project_id=PROJECT_ID,
-        region=REGION,
-        cluster_name=CLUSTER_NAME,
-    )
+    # # define the Tasks
+    # start_cluster = DataprocStartClusterOperator(
+    #     task_id="start_cluster",
+    #     project_id=PROJECT_ID,
+    #     region=REGION,
+    #     cluster_name=CLUSTER_NAME,
+    # )
 
     pyspark_task_1 = DataprocSubmitJobOperator(
         task_id="pyspark_task_1", 
@@ -146,7 +146,7 @@ with DAG(
     )
 
 # define the task dependencies
-create_cluster >> start_cluster >> pyspark_task_1 >> pyspark_task_2 >> pyspark_task_3 >> pyspark_task_4 >> stop_cluster >> delete_cluster
+create_cluster >> pyspark_task_1 >> pyspark_task_2 >> pyspark_task_3 >> pyspark_task_4 >> stop_cluster >> delete_cluster
 # pyspark_task_1 >> pyspark_task_2 >> pyspark_task_3 >> pyspark_task_4
 # create_cluster >> start_cluster >> pyspark_task_1 >> pyspark_task_2 >> pyspark_task_3 >> pyspark_task_4 >> stop_cluster >> delete_cluster
 
