@@ -157,26 +157,27 @@ with DAG(
         project_id=PROJECT_ID,
     )
 
-    # Stop cluster
-    stop_cluster = DataprocStopClusterOperator(
-        task_id="stop_cluster",
-        project_id=PROJECT_ID,
-        region=REGION,
-        cluster_name=CLUSTER_NAME,
-    )
+    # # Stop cluster
+    # stop_cluster = DataprocStopClusterOperator(
+    #     task_id="stop_cluster",
+    #     project_id=PROJECT_ID,
+    #     region=REGION,
+    #     cluster_name=CLUSTER_NAME,
+    # )
 
-    # Delete cluster
-    delete_cluster = DataprocDeleteClusterOperator(
-        task_id="delete_cluster",
-        project_id=PROJECT_ID,
-        region=REGION,
-        cluster_name=CLUSTER_NAME,
-    )
+    # # Delete cluster
+    # delete_cluster = DataprocDeleteClusterOperator(
+    #     task_id="delete_cluster",
+    #     project_id=PROJECT_ID,
+    #     region=REGION,
+    #     cluster_name=CLUSTER_NAME,
+    # )
 
     # -----------------------
     # Task Dependencies
     # -----------------------
     # create_cluster >> task_1 >> task_2 >> task_3 >> task_4 >> stop_cluster >> delete_cluster
+    # task_1 >> task_2 >> task_3 >> task_4
     create_cluster >> task_1 >> task_2 >> task_3 >> task_4
 
 
