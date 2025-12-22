@@ -1,6 +1,7 @@
 from airflow import DAG
 from datetime import timedelta
 from airflow.utils.dates import days_ago
+import os
 from airflow.providers.google.cloud.operators.dataproc import (
     DataprocCreateClusterOperator,
     DataprocSubmitJobOperator,
@@ -11,23 +12,28 @@ from airflow.providers.google.cloud.operators.dataproc import (
 )
 from airflow.models import Variable
 
+ENV = os.getenv("ENV", "DEV")
+
+def get_var(key: str):
+    return Variable.get(f"{ENV}_{key}")
+
 # -----------------------
 # Airflow Variables
 # -----------------------
-PROJECT_ID = Variable.get("PROJECT_ID")
-REGION = Variable.get("REGION")
-COMPOSER_BUCKET = Variable.get("COMPOSER_BUCKET")
-CLUSTER_NAME = Variable.get("CLUSTER_NAME")
-BQ_JAR = Variable.get("BQ_JAR")
-GCS_BUCKET = Variable.get("GCS_BUCKET")
-HOSPITAL_NAME_A = Variable.get("HOSPITAL_NAME_A")
-HOSPITAL_NAME_B = Variable.get("HOSPITAL_NAME_B")
-HOSPITAL_DB_A = Variable.get("HOSPITAL_DB_A")
-HOSPITAL_DB_B = Variable.get("HOSPITAL_DB_B")
-HOSPITAL_A_MYSQL_HOST = Variable.get("HOSPITAL_A_MYSQL_HOST")
-HOSPITAL_A_MYSQL_PORT = Variable.get("HOSPITAL_A_MYSQL_PORT")
-HOSPITAL_B_MYSQL_HOST = Variable.get("HOSPITAL_B_MYSQL_HOST")
-HOSPITAL_B_MYSQL_PORT = Variable.get("HOSPITAL_B_MYSQL_PORT")
+PROJECT_ID = get_var("PROJECT_ID")
+REGION = get_var("REGION")
+COMPOSER_BUCKET = get_var("COMPOSER_BUCKET")
+CLUSTER_NAME = get_var("CLUSTER_NAME")
+BQ_JAR = get_var("BQ_JAR")
+GCS_BUCKET = get_var("GCS_BUCKET")
+HOSPITAL_NAME_A = get_var("HOSPITAL_NAME_A")
+HOSPITAL_NAME_B = get_var("HOSPITAL_NAME_B")
+HOSPITAL_DB_A = get_var("HOSPITAL_DB_A")
+HOSPITAL_DB_B = get_var("HOSPITAL_DB_B")
+HOSPITAL_A_MYSQL_HOST = get_var("HOSPITAL_A_MYSQL_HOST")
+HOSPITAL_A_MYSQL_PORT = get_var("HOSPITAL_A_MYSQL_PORT")
+HOSPITAL_B_MYSQL_HOST = get_var("HOSPITAL_B_MYSQL_HOST")
+HOSPITAL_B_MYSQL_PORT = get_var("HOSPITAL_B_MYSQL_PORT")
 # -----------------------
 # PySpark job function
 # -----------------------
@@ -170,7 +176,9 @@ with DAG(
     # -----------------------
     # Task Dependencies
     # -----------------------
-    create_cluster >> task_1 >> task_2 >> task_3 >> task_4 >> stop_cluster >> delete_cluster
+    # create_cluster >> task_1 >> task_2 >> task_3 >> task_4 >> stop_cluster >> delete_cluster
+    task_1 >> task_2 >> task_3 >> task_4
+
 
 
 # ✅ Recommended Cluster Configuration for 100M rows/day
