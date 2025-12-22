@@ -323,6 +323,9 @@ def extract_and_save_to_landing(table, load_type, watermark_col):
 # Driver Code
 # =============================================================================
 for row in config_df.collect():
+    print(Constants.Common.IS_ACTIVE_COLUMN)
+    print(Constants.Common.DATA_SOURCE_COLUMN)
+    print(HOSPITAL_NAME_DB)
     if (
         row[Constants.Common.IS_ACTIVE_COLUMN] == '1'
         and row[Constants.Common.DATA_SOURCE_COLUMN] == HOSPITAL_NAME_DB

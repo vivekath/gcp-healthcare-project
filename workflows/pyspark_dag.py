@@ -125,37 +125,37 @@ with DAG(
     )
 
     # Hospital B ingestion
-    task_2 = DataprocSubmitJobOperator(
-        task_id="hospitalB_ingestion",
-        job=pyspark_job(
-            f"gs://{COMPOSER_BUCKET}/data/INGESTION/hospitalB_mysqlToLanding.py",
-            job_args=[f"--gcs_bucket={GCS_BUCKET}", f"--project_id={PROJECT_ID}", f"--hospital_name={HOSPITAL_NAME_B}", f"--hospital_db={HOSPITAL_DB_B}", f"--mysql_host={HOSPITAL_B_MYSQL_HOST}", f"--mysql_port={HOSPITAL_B_MYSQL_PORT}"]
-        ),
-        region=REGION,
-        project_id=PROJECT_ID,
-    )
+    # task_2 = DataprocSubmitJobOperator(
+    #     task_id="hospitalB_ingestion",
+    #     job=pyspark_job(
+    #         f"gs://{COMPOSER_BUCKET}/data/INGESTION/hospitalB_mysqlToLanding.py",
+    #         job_args=[f"--gcs_bucket={GCS_BUCKET}", f"--project_id={PROJECT_ID}", f"--hospital_name={HOSPITAL_NAME_B}", f"--hospital_db={HOSPITAL_DB_B}", f"--mysql_host={HOSPITAL_B_MYSQL_HOST}", f"--mysql_port={HOSPITAL_B_MYSQL_PORT}"]
+    #     ),
+    #     region=REGION,
+    #     project_id=PROJECT_ID,
+    # )
 
-    # Claims ingestion
-    task_3 = DataprocSubmitJobOperator(
-        task_id="claims_ingestion",
-        job=pyspark_job(
-            f"gs://{COMPOSER_BUCKET}/data/INGESTION/claims.py",
-            job_args=[f"--gcs_bucket={GCS_BUCKET}", f"--project_id={PROJECT_ID}"]
-        ),
-        region=REGION,
-        project_id=PROJECT_ID,
-    )
+    # # Claims ingestion
+    # task_3 = DataprocSubmitJobOperator(
+    #     task_id="claims_ingestion",
+    #     job=pyspark_job(
+    #         f"gs://{COMPOSER_BUCKET}/data/INGESTION/claims.py",
+    #         job_args=[f"--gcs_bucket={GCS_BUCKET}", f"--project_id={PROJECT_ID}"]
+    #     ),
+    #     region=REGION,
+    #     project_id=PROJECT_ID,
+    # )
 
-    # CPT Codes ingestion
-    task_4 = DataprocSubmitJobOperator(
-        task_id="cpt_codes_ingestion",
-        job=pyspark_job(
-            f"gs://{COMPOSER_BUCKET}/data/INGESTION/cpt_codes.py",
-            job_args=[f"--gcs_bucket={GCS_BUCKET}", f"--project_id={PROJECT_ID}"]
-        ),
-        region=REGION,
-        project_id=PROJECT_ID,
-    )
+    # # CPT Codes ingestion
+    # task_4 = DataprocSubmitJobOperator(
+    #     task_id="cpt_codes_ingestion",
+    #     job=pyspark_job(
+    #         f"gs://{COMPOSER_BUCKET}/data/INGESTION/cpt_codes.py",
+    #         job_args=[f"--gcs_bucket={GCS_BUCKET}", f"--project_id={PROJECT_ID}"]
+    #     ),
+    #     region=REGION,
+    #     project_id=PROJECT_ID,
+    # )
 
     # # Stop cluster
     # stop_cluster = DataprocStopClusterOperator(
@@ -177,8 +177,9 @@ with DAG(
     # Task Dependencies
     # -----------------------
     # create_cluster >> task_1 >> task_2 >> task_3 >> task_4 >> stop_cluster >> delete_cluster
-    task_1 >> task_2 >> task_3 >> task_4
+    # task_1 >> task_2 >> task_3 >> task_4
     # create_cluster >> task_1 >> task_2 >> task_3 >> task_4
+    task_1
 
 
 

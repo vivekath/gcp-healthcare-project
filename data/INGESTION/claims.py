@@ -44,7 +44,7 @@ claims_df = read_csv(spark, CLAIMS_BUCKET_PATH, header=True)
 # Add Datasource Column
 # =============================================================================
 claims_df = claims_df.withColumn(
-    Constants.Common.DATASOURCE_COLUMN,
+    Constants.Common.DATA_SOURCE_COLUMN,
     when(input_file_name().contains("hospital2"), "hosb")
     .when(input_file_name().contains("hospital1"), "hosb")
     .otherwise("None")
