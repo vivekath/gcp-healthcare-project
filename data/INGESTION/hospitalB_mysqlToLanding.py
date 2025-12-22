@@ -319,7 +319,7 @@ def extract_and_save_to_landing(table, load_type, watermark_col):
 # =============================================================================
 for row in config_df.collect():
     if (
-        row[Constants.Common.IS_ACTIVE_COLUMN] == "1"
+        row[Constants.Common.IS_ACTIVE_COLUMN] == 1
         and row[Constants.Common.DATA_SOURCE_COLUMN] == HOSPITAL_NAME_DB
     ):
         db, src, table, load_type, watermark, _, targetpath = row
