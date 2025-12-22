@@ -323,6 +323,7 @@ def extract_and_save_to_landing(table, load_type, watermark_col):
 # Driver Code
 # =============================================================================
 for row in config_df.collect():
+    print(f"vivek: {config_df.count()}")
     print(Constants.Common.IS_ACTIVE_COLUMN)
     print(Constants.Common.DATA_SOURCE_COLUMN)
     print(HOSPITAL_NAME_DB)
@@ -345,4 +346,4 @@ save_logs_to_bigquery(spark, BQ_LOG_TABLE, BQ_TEMP_PATH)
 # =============================================================================
 # Stop Spark Session
 # =============================================================================
-spark.stop()
+# spark.stop()
