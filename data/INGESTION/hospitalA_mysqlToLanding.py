@@ -133,7 +133,7 @@ def move_existing_files_to_archive(table):
     if not existing_files:
         log_event(
             Constants.Logger.INFO,
-            Constants.NO_EXISTING_FILES_MESSAGE.NO_EXISTING_FILES_MESSAGE.format(
+            Constants.SuccessMessage.NO_EXISTING_FILES_MESSAGE.format(
                 table=table
             )
         )
