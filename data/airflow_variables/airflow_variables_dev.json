@@ -23,7 +23,7 @@
   "DEV_SPARK_BIGQUERY_CONNECTOR_VERSION": "0.36.1",
   "DEV_OWNER": "VIVEK ATHILKAR",
   "DEV_DAG_START_DATE": "2026-01-01",
-  "DEV_EMAIL": "vivekneosoft@gmail.com,",
+  "DEV_EMAIL": "vivekneosoft@gmail.com",
   "DEV_RETRIES": "1",
   "DEV_RETRY_DELAY_MINUTES": "5",
   "DEV_SCHEDULE_INTERVAL": "0 5 * * *",

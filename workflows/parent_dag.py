@@ -19,7 +19,7 @@ def get_start_date():
 # Define default arguments
 PARENT_ARGS = {
     "owner": get_var("OWNER"),
-    "start_date": get_start_date(),
+    "start_date": days_ago(1),
     "depends_on_past": False,
     "email_on_failure": False,
     "email_on_retry": False,
@@ -35,6 +35,7 @@ with DAG(
     schedule_interval=get_var("SCHEDULE_INTERVAL"),
     description=get_var("PARENT_DAG_DESC"),
     default_args=PARENT_ARGS,
+    catchup=False,
     tags=get_var("PARENT_DAG_TAGS").split(",")
 ) as dag:
 

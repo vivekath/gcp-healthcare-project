@@ -34,7 +34,7 @@ GOLD_QUERY = read_sql_file(SQL_FILE_PATH_3)
 # Define default arguments
 ARGS = {
      "owner": get_var("OWNER"),
-    "start_date": get_start_date(),
+    "start_date": days_ago(1),
     "depends_on_past": False,
     "email_on_failure": False,
     "email_on_retry": False,
