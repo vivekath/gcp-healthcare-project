@@ -202,12 +202,13 @@ def get_latest_watermark(table_name):
 # =============================================================================
 def extract_and_save_to_landing(table, load_type, watermark_col):
     try:
+        print("1")
         last_watermark = (
             get_latest_watermark(table)
             if load_type.lower() == Constants.Common.DEFAULT_LOAD_TYPE
             else None
         )
-
+        print("2")
         log_event(
             Constants.Logger.INFO,
             Constants.SuccessMessage.LATEST_WATERMARK_MESSAGE.format(
@@ -216,7 +217,7 @@ def extract_and_save_to_landing(table, load_type, watermark_col):
             ),
             table=table
         )
-
+        print("3")
         query = (
             Constants.Query.FULL_TABLE_QUERY.format(table=table)
             if load_type.lower() == Constants.Common.FULL_LOAD_TYPE
@@ -226,7 +227,7 @@ def extract_and_save_to_landing(table, load_type, watermark_col):
                 last_watermark=last_watermark
             )
         )
-
+        print("4")
         df = (
             spark.read.format("jdbc")
             .option("url", MYSQL_CONFIG["url"])
@@ -236,7 +237,7 @@ def extract_and_save_to_landing(table, load_type, watermark_col):
             .option("dbtable", query)
             .load()
         )
-
+        print("5")  
         log_event(
             Constants.Logger.SUCCESS,
             Constants.SuccessMessage.DATA_EXTRACTED_MESSAGE.format(
@@ -244,14 +245,15 @@ def extract_and_save_to_landing(table, load_type, watermark_col):
             ),
             table=table
         )
-
+        print("6")
+         # Write DataFrame to GCS as JSON
         today = datetime.datetime.today().strftime('%d%m%Y')
         JSON_FILE_PATH = (
             f"landing/{HOSPITAL_NAME}/{table}/{table}_{today}.json"
         )
 
         blob = bucket.blob(JSON_FILE_PATH)
-
+        print("7")
         blob.upload_from_string(
             df.toPandas().to_json(
                 orient="records",
@@ -259,7 +261,7 @@ def extract_and_save_to_landing(table, load_type, watermark_col):
             ),
             content_type="application/json"
         )
-
+        print("8")
         log_event(
             Constants.Logger.SUCCESS,
             Constants.SuccessMessage.JSON_FILE_WRITTEN_MESSAGE.format(
@@ -268,7 +270,7 @@ def extract_and_save_to_landing(table, load_type, watermark_col):
             ),
             table=table
         )
-
+        print("9")
         schema_audit = StructType([
             StructField("data_source", StringType(), True),
             StructField("table_name", StringType(), True),
@@ -277,7 +279,7 @@ def extract_and_save_to_landing(table, load_type, watermark_col):
             StructField("load_timestamp", TimestampType(), True),
             StructField("status", StringType(), True)
         ])
-
+        print("10")
         audit_df = spark.createDataFrame(
             [
                 (
@@ -299,7 +301,7 @@ def extract_and_save_to_landing(table, load_type, watermark_col):
             .mode("append")
             .save()
         )
-
+        print("11")
         log_event(
             Constants.Logger.SUCCESS,
             Constants.SuccessMessage.AUDIT_LOG_UPDATED_MESSAGE.format(
@@ -309,6 +311,7 @@ def extract_and_save_to_landing(table, load_type, watermark_col):
         )
 
     except Exception as e:
+        print("12")
         log_event(
             Constants.Logger.ERROR,
             Constants.ErrorMessage.ERROR_PROCESSING_TABLE_MESSAGE.format(
