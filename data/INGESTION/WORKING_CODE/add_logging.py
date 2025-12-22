@@ -14,6 +14,7 @@
 # remove all string, add them in constant file and read from there
 # use common code for logging in pyspark and airflow both
 # add all, these points and check again how can we optimize from real time scenario
+# make standard ETL with all standard configurations understand (like location and all)
 
 # Spark session creation
 # GCS read/write helpers

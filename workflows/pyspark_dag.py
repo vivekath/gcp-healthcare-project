@@ -20,7 +20,14 @@ COMPOSER_BUCKET = Variable.get("COMPOSER_BUCKET")
 CLUSTER_NAME = Variable.get("CLUSTER_NAME")
 BQ_JAR = Variable.get("BQ_JAR")
 GCS_BUCKET = Variable.get("GCS_BUCKET")
-
+HOSPITAL_NAME_A = Variable.get("HOSPITAL_NAME_A")
+HOSPITAL_NAME_B = Variable.get("HOSPITAL_NAME_B")
+HOSPITAL_DB_A = Variable.get("HOSPITAL_DB_A")
+HOSPITAL_DB_B = Variable.get("HOSPITAL_DB_B")
+HOSPITAL_A_MYSQL_HOST = Variable.get("HOSPITAL_A_MYSQL_HOST")
+HOSPITAL_A_MYSQL_PORT = Variable.get("HOSPITAL_A_MYSQL_PORT")
+HOSPITAL_B_MYSQL_HOST = Variable.get("HOSPITAL_B_MYSQL_HOST")
+HOSPITAL_B_MYSQL_PORT = Variable.get("HOSPITAL_B_MYSQL_PORT")
 # -----------------------
 # PySpark job function
 # -----------------------
@@ -105,7 +112,7 @@ with DAG(
         task_id="hospitalA_ingestion",
         job=pyspark_job(
             f"gs://{COMPOSER_BUCKET}/data/INGESTION/hospitalA_mysqlToLanding.py",
-            job_args=[f"--gcs_bucket={GCS_BUCKET}"]
+            job_args=[f"--gcs_bucket={GCS_BUCKET}", f"--project_id={PROJECT_ID}", f"--hospital_name={HOSPITAL_NAME_A}", f"--hospital_db={HOSPITAL_DB_A}", f"--mysql_host={HOSPITAL_A_MYSQL_HOST}", f"--mysql_port={HOSPITAL_A_MYSQL_PORT}"]
         ),
         region=REGION,
         project_id=PROJECT_ID,
@@ -116,7 +123,7 @@ with DAG(
         task_id="hospitalB_ingestion",
         job=pyspark_job(
             f"gs://{COMPOSER_BUCKET}/data/INGESTION/hospitalB_mysqlToLanding.py",
-            job_args=[f"--gcs_bucket={GCS_BUCKET}"]
+            job_args=[f"--gcs_bucket={GCS_BUCKET}", f"--project_id={PROJECT_ID}", f"--hospital_name={HOSPITAL_NAME_B}", f"--hospital_db={HOSPITAL_DB_B}", f"--mysql_host={HOSPITAL_B_MYSQL_HOST}", f"--mysql_port={HOSPITAL_B_MYSQL_PORT}"]
         ),
         region=REGION,
         project_id=PROJECT_ID,
