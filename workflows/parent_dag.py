@@ -25,8 +25,8 @@ PARENT_ARGS = {
     "email_on_retry": False,
     "email": get_var("EMAIL").split(","),
     "email_on_success": False,
-    "retries": get_var("RETRIES"),
-    "retry_delay": timedelta(minutes=get_var("RETRY_DELAY_MINUTES")),
+    "retries": int(get_var("RETRIES")),
+    "retry_delay": timedelta(minutes=int(get_var("RETRY_DELAY_MINUTES"))),
 }
 
 # Define the parent DAG

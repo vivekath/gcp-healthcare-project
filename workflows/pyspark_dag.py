@@ -44,9 +44,9 @@ HOSPITAL_B_MYSQL_HOST = get_var("HOSPITAL_B_MYSQL_HOST")
 HOSPITAL_B_MYSQL_PORT = get_var("HOSPITAL_B_MYSQL_PORT")
 MASTER_MACHINE_TYPE = get_var("MASTER_MACHINE_TYPE")
 WORKER_MACHINE_TYPE = get_var("WORKER_MACHINE_TYPE")
-NUM_WORKERS = get_var("NUM_WORKERS")
-MASTER_DISK_SIZE = get_var("MASTER_DISK_SIZE")
-WORKER_DISK_SIZE = get_var("WORKER_DISK_SIZE")
+NUM_WORKERS = int(get_var("NUM_WORKERS"))
+MASTER_DISK_SIZE = int(get_var("MASTER_DISK_SIZE"))
+WORKER_DISK_SIZE = int(get_var("WORKER_DISK_SIZE"))
 IMAGE_VERSION = get_var("IMAGE_VERSION")
 INITIALIZATION_ACTIONS = get_var("INITIALIZATION_ACTIONS")
 SPARK_BIGQUERY_CONNECTOR_VERSION = get_var("SPARK_BIGQUERY_CONNECTOR_VERSION")
@@ -101,8 +101,8 @@ ARGS = {
     "email_on_retry": False,
     "email": get_var("EMAIL").split(","),
     "email_on_success": False,
-    "retries": get_var("RETRIES"),
-    "retry_delay": timedelta(minutes=get_var("RETRY_DELAY_MINUTES")),
+    "retries": int(get_var("RETRIES")),
+    "retry_delay": timedelta(minutes=int(get_var("RETRY_DELAY_MINUTES"))),
 }
 
 # -----------------------
