@@ -327,6 +327,7 @@ for row in config_df.collect():
     print(Constants.Common.IS_ACTIVE_COLUMN)
     print(Constants.Common.DATA_SOURCE_COLUMN)
     print(HOSPITAL_NAME_DB)
+    print(row[Constants.Common.IS_ACTIVE_COLUMN], row[Constants.Common.DATA_SOURCE_COLUMN])
     if (
         row[Constants.Common.IS_ACTIVE_COLUMN] == '1'
         and row[Constants.Common.DATA_SOURCE_COLUMN] == HOSPITAL_NAME_DB
