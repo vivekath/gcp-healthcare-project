@@ -11,7 +11,7 @@ from common_lib.constants import Constants
 # =============================================================================
 # Spark Initialization
 # =============================================================================
-spark = get_spark(Constants.Common.AppName.format(hospital_name="claims"))
+spark = get_spark(Constants.Common.APP_NAME.format(hospital_name="claims"))
 
 
 # =============================================================================

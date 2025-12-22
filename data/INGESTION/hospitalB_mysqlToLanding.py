@@ -77,7 +77,7 @@ bucket = storage_client.bucket(GCS_BUCKET)
 # Spark Initialization
 # =============================================================================
 spark = get_spark(
-    Constants.Common.AppName.format(hospital_name=HOSPITAL_NAME)
+    Constants.Common.APP_NAME.format(hospital_name=HOSPITAL_NAME)
 )
 
 
