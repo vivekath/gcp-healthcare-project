@@ -1,7 +1,6 @@
 from airflow import DAG
-from datetime import timedelta
-from airflow.utils.dates import days_ago
 import os
+from .parent_dag import PARENT_ARGS, get_var
 from airflow.providers.google.cloud.operators.dataproc import (
     DataprocCreateClusterOperator,
     DataprocSubmitJobOperator,
@@ -10,12 +9,6 @@ from airflow.providers.google.cloud.operators.dataproc import (
     ClusterGenerator,
     DataprocStartClusterOperator
 )
-from airflow.models import Variable
-
-ENV = os.getenv("ENV", "DEV")
-
-def get_var(key: str):
-    return Variable.get(f"{ENV}_{key}")
 
 # -----------------------
 # Airflow Variables
@@ -34,6 +27,14 @@ HOSPITAL_A_MYSQL_HOST = get_var("HOSPITAL_A_MYSQL_HOST")
 HOSPITAL_A_MYSQL_PORT = get_var("HOSPITAL_A_MYSQL_PORT")
 HOSPITAL_B_MYSQL_HOST = get_var("HOSPITAL_B_MYSQL_HOST")
 HOSPITAL_B_MYSQL_PORT = get_var("HOSPITAL_B_MYSQL_PORT")
+MASTER_MACHINE_TYPE = get_var("MASTER_MACHINE_TYPE")
+WORKER_MACHINE_TYPE = get_var("WORKER_MACHINE_TYPE")
+NUM_WORKERS = get_var("NUM_WORKERS")
+MASTER_DISK_SIZE = get_var("MASTER_DISK_SIZE")
+WORKER_DISK_SIZE = get_var("WORKER_DISK_SIZE")
+IMAGE_VERSION = get_var("IMAGE_VERSION")
+INITIALIZATION_ACTIONS = get_var("INITIALIZATION_ACTIONS")
+SPARK_BIGQUERY_CONNECTOR_VERSION = get_var("SPARK_BIGQUERY_CONNECTOR_VERSION")
 # -----------------------
 # PySpark job function
 # -----------------------
@@ -58,19 +59,19 @@ CLUSTER_CONFIG = ClusterGenerator(
     project_id=PROJECT_ID,
     region=REGION,
     cluster_name=CLUSTER_NAME,
-    master_machine_type="n1-standard-2",
-    worker_machine_type="n1-standard-2",
-    num_workers=2,
-    master_disk_size=50,
-    worker_disk_size=50,
-    image_version="2.0-debian10",
+    master_machine_type=MASTER_MACHINE_TYPE,
+    worker_machine_type=WORKER_MACHINE_TYPE,
+    num_workers=NUM_WORKERS,
+    master_disk_size=MASTER_DISK_SIZE,
+    worker_disk_size=WORKER_DISK_SIZE,
+    image_version=IMAGE_VERSION,
     optional_components=["JUPYTER"],
     enable_component_gateway=True,
     initialization_actions=[
-        "gs://goog-dataproc-initialization-actions/connectors/connectors.sh"
+        INITIALIZATION_ACTIONS
     ],
     metadata={
-        "spark-bigquery-connector-version": "0.36.1"
+        "spark-bigquery-connector-version": SPARK_BIGQUERY_CONNECTOR_VERSION
     }
 ).make()
 
@@ -78,22 +79,19 @@ CLUSTER_CONFIG = ClusterGenerator(
 # DAG default args
 # -----------------------
 ARGS = {
-    "owner": "vivek_athilkar",
-    "start_date": days_ago(1),
-    "depends_on_past": False,
-    "retries": 1,
-    "retry_delay": timedelta(minutes=5),
+    PARENT_ARGS
 }
 
 # -----------------------
 # DAG Definition
 # -----------------------
 with DAG(
-    dag_id="pyspark_dag_param",
+    dag_id=get_var("PYSPARK_DAG_ID"),
     default_args=ARGS,
     schedule_interval=None,
+    description=get_var("PYSPARK_DAG_DESC"),
     catchup=False,
-    tags=["pyspark", "dataproc", "etl"]
+    tags=get_var("PYSPARK_DAG_TAGS").split(",")
 ) as dag:
 
     # Create cluster
@@ -220,132 +218,5 @@ CLUSTER_CONFIG = ClusterGenerator(
         "spark-bigquery-connector-version": "0.34.0",  # latest stable
     },
 
-    # Enable autoscaling (very important for 100M+)
-    autoscaling_config="projects/{}/regions/{}/autoscalingPolicies/{}".format(
-        PROJECT_ID,
-        REGION,
-        "basic-spark-autoscale"
-    )
-
 ).make()
-"""
-
-"""
-2️⃣ Pass environment values using Dataproc job properties
-
-Instead of hardcoding:
-
-GCS_BUCKET = "heathcare-bucket-12112025"
-BQ_PROJECT = "quantum-episode-345713"
-
-🔹 Use environment variables
-Modify your PySpark job submission
-PYSPARK_JOB_1 = {
-    "reference": {"project_id": PROJECT_ID},
-    "placement": {"cluster_name": CLUSTER_NAME},
-    "pyspark_job": {
-        "main_python_file_uri": GCS_JOB_FILE_1,
-        "properties": {
-            "spark.executorEnv.GCS_BUCKET": "heathcare-bucket-12112025",
-            "spark.executorEnv.BQ_PROJECT": "quantum-episode-345713",
-            "spark.executorEnv.HOSPITAL_NAME": "hospital-a"
-        }
-    }
-}
-
-3️⃣ Read env variables inside your PySpark code
-
-Update hospitalA_mysqlToLanding.py:
-
-import os
-
-GCS_BUCKET = os.getenv("GCS_BUCKET")
-BQ_PROJECT = os.getenv("BQ_PROJECT")
-HOSPITAL_NAME = os.getenv("HOSPITAL_NAME")
-
-
-Then reuse everywhere:
-
-LANDING_PATH = f"gs://{GCS_BUCKET}/landing/{HOSPITAL_NAME}/"
-ARCHIVE_PATH = f"gs://{GCS_BUCKET}/landing/{HOSPITAL_NAME}/archive/"
-
-
-✔ No hardcoding
-✔ Different environments (dev/qa/prod) supported
-✔ Same job runs everywhere
-
-4️⃣ Even better: Use Composer Variables (Recommended)
-
-Since you are using Cloud Composer, this is cleaner.
-
-In Composer UI:
-Admin → Variables
-
-
-Add:
-
-GCS_BUCKET = heathcare-bucket-12112025
-BQ_PROJECT = quantum-episode-345713
-HOSPITAL_NAME = hospital-a
-
-Pass them into Dataproc job dynamically
-from airflow.models import Variable
-
-PYSPARK_JOB_1 = {
-    "reference": {"project_id": PROJECT_ID},
-    "placement": {"cluster_name": CLUSTER_NAME},
-    "pyspark_job": {
-        "main_python_file_uri": GCS_JOB_FILE_1,
-        "properties": {
-            "spark.executorEnv.GCS_BUCKET": Variable.get("GCS_BUCKET"),
-            "spark.executorEnv.BQ_PROJECT": Variable.get("BQ_PROJECT"),
-            "spark.executorEnv.HOSPITAL_NAME": Variable.get("HOSPITAL_NAME")
-        }
-    }
-}
-
-
-👉 This is how production pipelines are done
-"""
-
-"""
-✅ How to read these variables in your DAG / PySpark code
-In Airflow DAG
-from airflow.models import Variable
-
-GCS_BUCKET = Variable.get("GCS_BUCKET")
-BQ_PROJECT = Variable.get("BQ_PROJECT")
-HOSPITAL_NAME = Variable.get("HOSPITAL_NAME")
-
-In PySpark job (Dataproc Serverless / Cluster)
-
-You have two correct options:
-
-Option 1️⃣ Pass as job arguments (BEST PRACTICE)
-
-In DAG:
-
-job=build_pyspark_job(
-    f"gs://{COMPOSER_BUCKET}/data/INGESTION/hospitalA_mysqlToLanding.py",
-    args=[
-        f"--gcs_bucket={Variable.get('GCS_BUCKET')}",
-        f"--bq_project={Variable.get('BQ_PROJECT')}",
-        f"--hospital_name={Variable.get('HOSPITAL_NAME')}"
-    ]
-)
-
-
-In PySpark:
-
-import argparse
-
-parser = argparse.ArgumentParser()
-parser.add_argument("--gcs_bucket")
-parser.add_argument("--bq_project")
-parser.add_argument("--hospital_name")
-args = parser.parse_args()
-
-GCS_BUCKET = args.gcs_bucket
-BQ_PROJECT = args.bq_project
-HOSPITAL_NAME = args.hospital_name
 """

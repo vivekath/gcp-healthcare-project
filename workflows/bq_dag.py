@@ -3,10 +3,9 @@ from airflow import DAG
 from datetime import timedelta
 from airflow.utils.dates import days_ago
 from airflow.providers.google.cloud.operators.bigquery import BigQueryInsertJobOperator
+from .parent_dag import PARENT_ARGS, get_var
 
 # Define constants
-PROJECT_ID = "quantum-episode-345713"
-LOCATION = "US"
 SQL_FILE_PATH_1 = "/home/airflow/gcs/data/BQ/bronze.sql"
 SQL_FILE_PATH_2 = "/home/airflow/gcs/data/BQ/silver.sql"
 SQL_FILE_PATH_3 = "/home/airflow/gcs/data/BQ/gold.sql"
@@ -22,24 +21,17 @@ GOLD_QUERY = read_sql_file(SQL_FILE_PATH_3)
 
 # Define default arguments
 ARGS = {
-    "owner": "VIVEK ATHILKAR",
-    "start_date": days_ago(1),
-    "depends_on_past": False,
-    "email_on_failure": False,
-    "email_on_retry": False,
-    "email": ["vivekneosoft@gmail.com"],
-    "email_on_success": False,
-    "retries": 1,
-    "retry_delay": timedelta(minutes=5)
+    PARENT_ARGS
 }
 
 # Define the DAG
 with DAG(
-    dag_id="bigquery_dag",
+    dag_id=get_var("BQ_DAG_ID"),
     schedule_interval=None,
-    description="DAG to run the bigquery jobs",
+    description=get_var("BQ_DAG_DESC"),
     default_args=ARGS,
-    tags=["gcs", "bq", "etl", "marvel"]
+    catchup=False,
+    tags=get_var("BQ_DAG_TAGS").split(",")
 ) as dag:
 
     # Task to create bronze table

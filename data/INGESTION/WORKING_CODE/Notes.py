@@ -330,3 +330,15 @@ Cost model	Pay per job (seconds)	Pay per VM uptime
 Startup time	Faster	Slower (cluster spin-up)
 Ops effort	Very low	High
 Control	Limited	Full control
+# -----------------------------------------------------------
+2️⃣ Detailed comparison (serverless vs cluster)
+"""
+🔴 What was wrong in the original DAG
+Issue	Why it’s bad
+Cluster create/start/stop	Expensive, slow, unnecessary
+Hard-coded project, region, bucket	Breaks dev/qa/prod portability
+Cluster sizing in DAG	Tight coupling + cost risk
+Multiple duplicated job configs	Hard to maintain
+Manual connector setup	Serverless already handles this
+Idle cluster cost	You pay even when nothing runs
+"""
