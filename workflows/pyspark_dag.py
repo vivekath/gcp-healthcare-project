@@ -97,13 +97,13 @@ with DAG(
 ) as dag:
 
     # Create cluster
-    create_cluster = DataprocCreateClusterOperator(
-        task_id="create_cluster",
-        project_id=PROJECT_ID,
-        cluster_config=CLUSTER_CONFIG,
-        region=REGION,
-        cluster_name=CLUSTER_NAME,
-    )
+    # create_cluster = DataprocCreateClusterOperator(
+    #     task_id="create_cluster",
+    #     project_id=PROJECT_ID,
+    #     cluster_config=CLUSTER_CONFIG,
+    #     region=REGION,
+    #     cluster_name=CLUSTER_NAME,
+    # )
 
     #     # define the Tasks
     # start_cluster = DataprocStartClusterOperator(
