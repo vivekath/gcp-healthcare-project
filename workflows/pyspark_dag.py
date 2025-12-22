@@ -95,7 +95,7 @@ CLUSTER_CONFIG = ClusterGenerator(
 # -----------------------
 ARGS = {
     "owner": get_var("OWNER"),
-    "start_date": days_ago(1),
+    "start_date": get_start_date(),
     "depends_on_past": False,
     "email_on_failure": False,
     "email_on_retry": False,
