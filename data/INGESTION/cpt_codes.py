@@ -4,7 +4,7 @@
 import argparse
 
 from common_lib.spark_utils import get_spark, read_csv
-from common.constants import Constants
+from common_lib.constants import Constants
 
 
 # =============================================================================

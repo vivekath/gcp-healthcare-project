@@ -14,7 +14,7 @@ from common_lib.config_utils import (
     save_logs_to_gcs,
     save_logs_to_bigquery
 )
-from common.constants import Constants
+from common_lib.constants import Constants
 
 
 # =============================================================================
