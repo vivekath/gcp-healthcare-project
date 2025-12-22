@@ -1,7 +1,6 @@
 # =============================================================================
 # Imports
 # =============================================================================
-from pyspark.sql import SparkSession
 import argparse
 
 from common_lib.spark_utils import get_spark, read_csv
