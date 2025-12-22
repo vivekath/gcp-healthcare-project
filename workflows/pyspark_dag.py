@@ -177,7 +177,7 @@ with DAG(
     # Task Dependencies
     # -----------------------
     # create_cluster >> task_1 >> task_2 >> task_3 >> task_4 >> stop_cluster >> delete_cluster
-    task_1 >> task_2 >> task_3 >> task_4
+    create_cluster >> task_1 >> task_2 >> task_3 >> task_4
 
 
 
