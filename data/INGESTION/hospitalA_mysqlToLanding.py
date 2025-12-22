@@ -133,7 +133,7 @@ def move_existing_files_to_archive(table):
     if not existing_files:
         log_event(
             Constants.Logger.INFO,
-            Constants.InfoMessage.NO_EXISTING_FILES_MESSAGE.format(
+            Constants.NO_EXISTING_FILES_MESSAGE.NO_EXISTING_FILES_MESSAGE.format(
                 table=table
             )
         )
@@ -326,12 +326,6 @@ def extract_and_save_to_landing(table, load_type, watermark_col):
 # Driver Code
 # =============================================================================
 for row in config_df.collect():
-    print(f"vivek: {config_df.count()}")
-    print(Constants.Common.IS_ACTIVE_COLUMN)
-    print(Constants.Common.DATA_SOURCE_COLUMN)
-    print(HOSPITAL_NAME_DB)
-    print(row[Constants.Common.IS_ACTIVE_COLUMN], row[Constants.Common.DATA_SOURCE_COLUMN])
-    print(row[Constants.Common.IS_ACTIVE_COLUMN] == 1, row[Constants.Common.IS_ACTIVE_COLUMN] == "1", row[Constants.Common.DATA_SOURCE_COLUMN] == HOSPITAL_NAME_DB)
     if (
         row[Constants.Common.IS_ACTIVE_COLUMN] == 1
         and row[Constants.Common.DATA_SOURCE_COLUMN] == HOSPITAL_NAME_DB
