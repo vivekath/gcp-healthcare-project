@@ -1,10 +1,9 @@
 import airflow
 from airflow import DAG
-from datetime import timedelta
+from datetime import timedelta,datetime
 from airflow.utils.dates import days_ago
 from airflow.operators.dagrun_operator import TriggerDagRunOperator
 from airflow.models import Variable
-from datetime import datetime
 import os
 ENV = os.getenv("ENV", "DEV")
 

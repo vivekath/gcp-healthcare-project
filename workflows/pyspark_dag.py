@@ -1,6 +1,21 @@
 from airflow import DAG
 import os
-from .parent_dag import PARENT_ARGS, get_var
+import os
+from airflow.models import Variable
+from datetime import datetime, timedelta
+from airflow.utils.dates import days_ago
+
+ENV = os.getenv("ENV", "DEV")
+
+def get_var(key: str):
+    return Variable.get(f"{ENV}_{key}")
+
+def get_start_date():
+    start_date_str = get_var("DAG_START_DATE")
+    if start_date_str:
+        return datetime.strptime(start_date_str, "%Y-%m-%d")
+    return days_ago(1)
+
 from airflow.providers.google.cloud.operators.dataproc import (
     DataprocCreateClusterOperator,
     DataprocSubmitJobOperator,
@@ -79,7 +94,15 @@ CLUSTER_CONFIG = ClusterGenerator(
 # DAG default args
 # -----------------------
 ARGS = {
-    PARENT_ARGS
+    "owner": get_var("OWNER"),
+    "start_date": get_start_date(),
+    "depends_on_past": False,
+    "email_on_failure": False,
+    "email_on_retry": False,
+    "email": get_var("EMAIL").split(","),
+    "email_on_success": False,
+    "retries": get_var("RETRIES"),
+    "retry_delay": timedelta(minutes=get_var("RETRY_DELAY_MINUTES")),
 }
 
 # -----------------------
