@@ -1,0 +1,16 @@
+{
+  "UAT_PROJECT_ID": "quantum-episode-345713",
+  "UAT_REGION": "us-east1",
+  "UAT_COMPOSER_BUCKET": "us-central1-demo-instance-e1b371f8-bucket",
+  "UAT_CLUSTER_NAME": "my-demo-cluster2",
+  "UAT_BQ_JAR": "gs://spark-lib/bigquery/spark-bigquery-with-dependencies_2.12-0.36.1.jar",
+  "UAT_GCS_BUCKET": "healthcare-bucket-20122025",
+  "UAT_HOSPITAL_NAME_A": "hospital-a",
+  "UAT_HOSPITAL_NAME_B": "hospital-b",
+  "UAT_HOSPITAL_DB_A": "hospital_a_db",
+  "UAT_HOSPITAL_DB_B": "hospital_b_db",
+  "UAT_HOSPITAL_A_MYSQL_HOST": "34.47.224.154",
+  "UAT_HOSPITAL_A_MYSQL_PORT": "3306",
+  "UAT_HOSPITAL_B_MYSQL_HOST": "34.14.185.46",
+  "UAT_HOSPITAL_B_MYSQL_PORT": "3306"
+}

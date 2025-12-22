@@ -29,7 +29,7 @@ args = parser.parse_args()
 GCS_BUCKET = args.gcs_bucket
 BQ_PROJECT = args.project_id
 
-CLAIMS_BUCKET_PATH = Constants.GCP.GCS_CLAIMS_PATH.format(GCS_BUCKET=GCS_BUCKET)
+CLAIMS_BUCKET_PATH = Constants.GCP.GCS_CLAIMS_PATH.format(gcs_bucket=GCS_BUCKET)
 BQ_TABLE = Constants.BQ.CLAIMS_TABLE.format(bq_project=BQ_PROJECT)
 BQ_TEMP_PATH = Constants.BQ.TEMP_PATH.format(gcs_bucket=GCS_BUCKET)
 

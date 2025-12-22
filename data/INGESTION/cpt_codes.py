@@ -28,7 +28,7 @@ args = parser.parse_args()
 GCS_BUCKET = args.gcs_bucket
 BQ_PROJECT = args.project_id
 
-CPT_BUCKET_PATH = Constants.GCP.GCS_CPT_CODES_PATH.format(GCS_BUCKET=GCS_BUCKET)
+CPT_BUCKET_PATH = Constants.GCP.GCS_CPT_CODES_PATH.format(gcs_bucket=GCS_BUCKET)
 BQ_TABLE = Constants.BQ.CPT_CODES_TABLE.format(bq_project=BQ_PROJECT)
 BQ_TEMP_PATH = Constants.BQ.TEMP_PATH.format(gcs_bucket=GCS_BUCKET)
 
