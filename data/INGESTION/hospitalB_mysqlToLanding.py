@@ -109,7 +109,16 @@ MYSQL_CONFIG = {
 # Read Configuration File
 # =============================================================================
 def read_config_file():
-    df = read_csv(spark, CONFIG_FILE_PATH, header=True)
+    pipeline_config_schema = StructType([
+        StructField("database", StringType(), False),     
+        StructField("datasource", StringType(), False),    
+        StructField("tablename", StringType(), False),     
+        StructField("loadtype", StringType(), False),       
+        StructField("watermark", StringType(), True),      
+        StructField("is_active", IntegerType(), False),     
+        StructField("targetpath", StringType(), False)     
+        ])
+    df = read_csv(spark, CONFIG_FILE_PATH, header=True,schema=pipeline_config_schema)
     log_event(
         Constants.Logger.INFO,
         Constants.SuccessMessage.CONFIG_FILE_READ_MESSAGE

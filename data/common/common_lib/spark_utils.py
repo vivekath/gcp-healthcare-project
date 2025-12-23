@@ -1,4 +1,5 @@
 from pyspark.sql import SparkSession
+from pyspark.sql.types import StructType
 
 def get_spark(app_name: str, spark_config: dict = None) -> SparkSession:
     return (
@@ -36,12 +37,19 @@ def read_gcs(
 ):
     return spark.read.format(fmt).options(**options).load(path)
 
-def read_csv(spark, path: str, header=True, infer_schema=True):
-    return spark.read.csv(
-        path,
-        header=header,
-        inferSchema=infer_schema
-    )
+def read_csv(
+    spark,
+    path,
+    header=True,
+    infer_schema=False,
+    schema: StructType = None
+):
+    reader = spark.read.option("header", str(header).lower())
+    if schema is not None:
+        reader = reader.schema(schema)
+    else:
+        reader = reader.option("inferSchema", str(infer_schema).lower())
+    return reader.csv(path)
 
 def read_json(spark, path: str, multiline=False):
     return spark.read.option("multiline", multiline).json(path)

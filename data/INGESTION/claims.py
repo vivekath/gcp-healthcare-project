@@ -7,6 +7,10 @@ import argparse
 from common_lib.spark_utils import get_spark, read_csv
 from common_lib.constants import Constants
 import json
+from pyspark.sql.types import (
+    StructType, StructField,
+    StringType, FloatType
+)
 
 
 # =============================================================================
@@ -41,7 +45,29 @@ BQ_TEMP_PATH = Constants.BQ.TEMP_PATH.format(gcs_bucket=GCS_BUCKET)
 # =============================================================================
 # Read Claims Data from GCS
 # =============================================================================
-claims_df = read_csv(spark, CLAIMS_BUCKET_PATH, header=True) 
+claims_schema = StructType([
+    StructField("ClaimID", StringType(), True),
+    StructField("TransactionID", StringType(), True),
+    StructField("PatientID", StringType(), True),
+    StructField("EncounterID", StringType(), True),
+    StructField("ProviderID", StringType(), True),
+    StructField("DeptID", StringType(), True),
+    StructField("ServiceDate", StringType(), True),
+    StructField("ClaimDate", StringType(), True),
+    StructField("PayorID", StringType(), True),
+    StructField("ClaimAmount", FloatType(), True),
+    StructField("PaidAmount", FloatType(), True),
+    StructField("ClaimStatus", StringType(), True),
+    StructField("PayorType", StringType(), True),
+    StructField("Deductible", FloatType(), True),
+    StructField("Coinsurance", FloatType(), True),
+    StructField("Copay", FloatType(), True),
+    StructField("InsertDate", StringType(), True),
+    StructField("ModifiedDate", StringType(), True),
+    StructField("datasource", StringType(), False)  # REQUIRED
+])
+
+claims_df = read_csv(spark, CLAIMS_BUCKET_PATH, header=True, schema=claims_schema)
 
 
 # =============================================================================
