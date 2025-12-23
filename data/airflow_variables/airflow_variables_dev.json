@@ -1,4 +1,5 @@
 {
+  "ENV": "DEV",
   "DEV_PROJECT_ID": "quantum-episode-345713",
   "DEV_REGION": "us-east1",
   "DEV_COMPOSER_BUCKET": "us-central1-demo-instance-2285d85b-bucket",

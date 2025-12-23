@@ -6,7 +6,8 @@ from datetime import datetime, timedelta
 from airflow.utils.dates import days_ago
 import json
 
-ENV = os.getenv("ENV", "DEV")
+# ENV = os.getenv("ENV", "DEV")
+ENV = Variable.get("ENV")
 
 def get_var(key: str):
     return Variable.get(f"{ENV}_{key}")
