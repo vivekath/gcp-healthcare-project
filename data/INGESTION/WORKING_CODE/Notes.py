@@ -99,6 +99,8 @@ gcloud dataproc clusters create dev-single-node \
 # Load Bronze table data using external table instead of managed table (Create table)
 # GCP services used => BQ, Cloud SQL, GCS, Dataproc, Cloud Build, Cloud Composer
 # Surrogate key (Unique key generated internally, not from source system, generally used in SCD Type 2)
+# Schema evaluation
+# Ephemeral clusters 
 # ------------------------------------------------------------------------------------------------------------
 # Fully prepare this health project, this will help, prepare SQL, Pyhton, Real time scenarios questions and answers document
 # --------------------------------------------------------------------------------------------------

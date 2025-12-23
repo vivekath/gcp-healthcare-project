@@ -1,3 +1,5 @@
+# DEV ETL time => 28 mins
+# PROD ETL time => 24 mins
 import airflow
 from airflow import DAG
 from datetime import timedelta,datetime
