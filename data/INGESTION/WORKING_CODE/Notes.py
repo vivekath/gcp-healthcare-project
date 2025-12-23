@@ -28,6 +28,20 @@ gcloud dataproc clusters create ${CLUSTER_NAME} \
   --initialization-actions=gs://goog-dataproc-initialization-actions-${REGION}/connectors/connectors.sh \
   --metadata bigquery-connector-version=1.2.0,spark-bigquery-connector-version=0.21.0
 # ------------------------------------------------------------------------------
+gcloud services enable \
+  bigquery.googleapis.com \
+  compute.googleapis.com \
+  storage.googleapis.com \
+  composer.googleapis.com \
+  dataproc.googleapis.com \
+  dataflow.googleapis.com \
+  secretmanager.googleapis.com \
+  sqladmin.googleapis.com \
+  cloudfunctions.googleapis.com \
+  cloudscheduler.googleapis.com \
+  cloudresourcemanager.googleapis.com \
+  --project=quantum-episode-345713
+# -------------------------------------------------------------------------------
 # Cheapest Dataproc setup (VERY IMPORTANT)
 # Single-node cluster (learning/dev)
 gcloud dataproc clusters create dev-single-node \
