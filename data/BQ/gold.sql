@@ -26,59 +26,59 @@ GROUP BY Provider_Name, Dept_Name;
 --------------------------------------------------------------------------------------------------
 --2. Patient History (Gold) : This table provides a complete history of a patient’s visits, diagnoses, and financial interactions.
 
-# CREATE TABLE
-CREATE TABLE IF NOT EXISTS `quantum-episode-345713.gold_dataset.FACT_PATIENT_HISTORY` (
-    Patient_Key STRING,
-    FirstName STRING,
-    LastName STRING,
-    Gender STRING,
-    DOB INT64,
-    Address STRING,
-    EncounterDate INT64,
-    EncounterType STRING,
-    Transaction_Key STRING,
-    VisitDate INT64,
-    ServiceDate INT64,
-    BilledAmount FLOAT64,
-    PaidAmount FLOAT64,
-    ClaimStatus STRING,
-    ClaimAmount FLOAT64,
-    ClaimPaidAmount STRING,
-    PayorType STRING
-);
+-- # CREATE TABLE
+-- CREATE TABLE IF NOT EXISTS `quantum-episode-345713.gold_dataset.FACT_PATIENT_HISTORY` (
+--     Patient_Key STRING,
+--     FirstName STRING,
+--     LastName STRING,
+--     Gender STRING,
+--     DOB INT64,
+--     Address STRING,
+--     EncounterDate INT64,
+--     EncounterType STRING,
+--     Transaction_Key STRING,
+--     VisitDate INT64,
+--     ServiceDate INT64,
+--     BilledAmount FLOAT64,
+--     PaidAmount FLOAT64,
+--     ClaimStatus STRING,
+--     ClaimAmount FLOAT64,
+--     ClaimPaidAmount FLOAT64,
+--     PayorType STRING
+-- );
 
 
-# TRUNCATE TABLE
-TRUNCATE TABLE `quantum-episode-345713.gold_dataset.FACT_PATIENT_HISTORY`;
+-- # TRUNCATE TABLE
+-- TRUNCATE TABLE `quantum-episode-345713.gold_dataset.FACT_PATIENT_HISTORY`;
 
-# INSERT DATA
-INSERT INTO `quantum-episode-345713.gold_dataset.FACT_PATIENT_HISTORY`
-SELECT 
-    p.Patient_Key,
-    p.FirstName,
-    p.LastName,
-    p.Gender,
-    p.DOB,
-    p.Address,
-    e.EncounterDate,
-    e.EncounterType,
-    t.Transaction_Key,
-    t.VisitDate,
-    t.ServiceDate,
-    t.Amount AS BilledAmount,
-    t.PaidAmount,
-    c.ClaimStatus,
-    c.ClaimAmount,
-    c.PaidAmount AS ClaimPaidAmount,
-    c.PayorType
-FROM `quantum-episode-345713.silver_dataset.DIM_PATIENTS` p
-LEFT JOIN `quantum-episode-345713.silver_dataset.DIM_ENCOUNTERS` e 
-    ON SPLIT(p.Patient_Key, '-')[OFFSET(0)] || '-' || SPLIT(p.Patient_Key, '-')[OFFSET(1)] = e.PatientID
-LEFT JOIN `quantum-episode-345713.silver_dataset.DIM_TRANSACTIONS` t 
-    ON SPLIT(p.Patient_Key, '-')[OFFSET(0)] || '-' || SPLIT(p.Patient_Key, '-')[OFFSET(1)] = t.PatientID
-LEFT JOIN `quantum-episode-345713.silver_dataset.DIM_CLAIMS` c 
-    ON t.SRC_TransactionID = c.TransactionID
-WHERE p.is_current = TRUE;
+-- # INSERT DATA
+-- INSERT INTO `quantum-episode-345713.gold_dataset.FACT_PATIENT_HISTORY`
+-- SELECT 
+--     p.Patient_Key,
+--     p.FirstName,
+--     p.LastName,
+--     p.Gender,
+--     p.DOB,
+--     p.Address,
+--     e.EncounterDate,
+--     e.EncounterType,
+--     t.Transaction_Key,
+--     t.VisitDate,
+--     t.ServiceDate,
+--     t.Amount AS BilledAmount,
+--     t.PaidAmount,
+--     c.ClaimStatus,
+--     c.ClaimAmount,
+--     c.PaidAmount AS ClaimPaidAmount,
+--     c.PayorType
+-- FROM `quantum-episode-345713.silver_dataset.DIM_PATIENTS` p
+-- LEFT JOIN `quantum-episode-345713.silver_dataset.DIM_ENCOUNTERS` e 
+--     ON SPLIT(p.Patient_Key, '-')[OFFSET(0)] || '-' || SPLIT(p.Patient_Key, '-')[OFFSET(1)] = e.PatientID
+-- LEFT JOIN `quantum-episode-345713.silver_dataset.DIM_TRANSACTIONS` t 
+--     ON SPLIT(p.Patient_Key, '-')[OFFSET(0)] || '-' || SPLIT(p.Patient_Key, '-')[OFFSET(1)] = t.PatientID
+-- LEFT JOIN `quantum-episode-345713.silver_dataset.DIM_CLAIMS` c 
+--     ON t.SRC_TransactionID = c.TransactionID
+-- WHERE p.is_current = TRUE;
 
 
 --------------------------------------------------------------------------------------------------
