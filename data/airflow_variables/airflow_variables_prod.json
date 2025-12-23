@@ -1,7 +1,7 @@
 {
   "PROD_PROJECT_ID": "quantum-episode-345713",
   "PROD_REGION": "us-east1",
-  "PROD_COMPOSER_BUCKET": "us-central1-demo-instance-e1b371f8-bucket",
+  "PROD_COMPOSER_BUCKET": "us-central1-demo-instance-2285d85b-bucket",
   "PROD_CLUSTER_NAME": "my-demo-cluster2",
   "PROD_BQ_JAR": "gs://spark-lib/bigquery/spark-bigquery-with-dependencies_2.12-0.36.1.jar",
   "PROD_GCS_BUCKET": "healthcare-bucket-20122025",
@@ -13,9 +13,9 @@
   "PROD_HOSPITAL_A_MYSQL_PORT": "3306",
   "PROD_HOSPITAL_B_MYSQL_HOST": "34.14.185.46",
   "PROD_HOSPITAL_B_MYSQL_PORT": "3306",
-  "PROD_MASTER_MACHINE_TYPE": "n1-standard-2",
-  "PROD_WORKER_MACHINE_TYPE": "n1-standard-2",
-  "PROD_NUM_WORKERS": 2,
+  "PROD_MASTER_MACHINE_TYPE": "n1-standard-4",
+  "PROD_WORKER_MACHINE_TYPE": "n1-standard-4",
+  "PROD_NUM_WORKERS": 4,
   "PROD_MASTER_DISK_SIZE": 50,
   "PROD_WORKER_DISK_SIZE": 50,
   "PROD_IMAGE_VERSION": "2.0-debian10",
@@ -35,5 +35,13 @@
   "PROD_PYSPARK_DAG_TAGS": "pyspark,dataproc,etl",
   "PROD_PYSPARK_DAG_DESC": "DAG to run the pyspark jobs",
   "PROD_BQ_DAG_DESC": "DAG to run the bigquery jobs",
-  "PROD_BQ_DAG_TAGS": "gcs,bq,etl,marvel"
+  "PROD_BQ_DAG_TAGS": "gcs,bq,etl,marvel",
+  "PROD_SPARK_EXECUTOR_INSTANCES" : "2",
+  "PROD_SPARK_EXECUTOR_CORES" : "2",
+  "PROD_SPARK_EXECUTOR_MEMORY" : "4g",
+  "PROD_SPARK_DRIVER_MEMORY" : "2g",
+  "PROD_SQL_SHUFFLE_PARTITIONS" : "8",
+  "PROD_SPARK_DEFAULT_PARALLELISM" : "8",
+  "PROD_VIEWS_ENABLED" : "true",
+  "PROD_MATERIALIZATION_DATASET" : "spark_temp"
 }

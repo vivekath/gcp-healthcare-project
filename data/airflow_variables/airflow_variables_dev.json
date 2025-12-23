@@ -1,7 +1,7 @@
 {
   "DEV_PROJECT_ID": "quantum-episode-345713",
   "DEV_REGION": "us-east1",
-  "DEV_COMPOSER_BUCKET": "us-central1-demo-instance-e1b371f8-bucket",
+  "DEV_COMPOSER_BUCKET": "us-central1-demo-instance-2285d85b-bucket",
   "DEV_CLUSTER_NAME": "my-demo-cluster2",
   "DEV_BQ_JAR": "gs://spark-lib/bigquery/spark-bigquery-with-dependencies_2.12-0.36.1.jar",
   "DEV_GCS_BUCKET": "healthcare-bucket-20122025",
@@ -35,5 +35,13 @@
   "DEV_PYSPARK_DAG_TAGS": "pyspark,dataproc,etl",
   "DEV_PYSPARK_DAG_DESC": "DAG to run the pyspark jobs",
   "DEV_BQ_DAG_DESC": "DAG to run the bigquery jobs",
-  "DEV_BQ_DAG_TAGS": "gcs,bq,etl,marvel"
+  "DEV_BQ_DAG_TAGS": "gcs,bq,etl,marvel",
+  "DEV_SPARK_EXECUTOR_INSTANCES" : "2",
+  "DEV_SPARK_EXECUTOR_CORES" : "2",
+  "DEV_SPARK_EXECUTOR_MEMORY" : "4g",
+  "DEV_SPARK_DRIVER_MEMORY" : "2g",
+  "DEV_SQL_SHUFFLE_PARTITIONS" : "8",
+  "DEV_SPARK_DEFAULT_PARALLELISM" : "8",
+  "DEV_VIEWS_ENABLED" : "true",
+  "DEV_MATERIALIZATION_DATASET" : "spark_temp"
 }

@@ -8,19 +8,21 @@ from common_lib.constants import Constants
 
 
 # =============================================================================
-# Spark Initialization
-# =============================================================================
-spark = get_spark(Constants.Common.APP_NAME.format(hospital_name="cpt_codes"))
-
-
-# =============================================================================
 # Argument Parsing
 # =============================================================================
 parser = argparse.ArgumentParser()
 parser.add_argument("--gcs_bucket", required=True, help="GCS bucket name")
 parser.add_argument("--project_id", required=True, help="GCP project ID")
+parser.add_argument("--spark_config", required=True, help="Spark configuration")
 args = parser.parse_args()
 
+
+# =============================================================================
+# Spark Initialization
+# =============================================================================
+spark_config = args.spark_config
+
+spark = get_spark(Constants.Common.APP_NAME.format(hospital_name="cpt_codes"), spark_config=args.spark_config)
 
 # =============================================================================
 # Configuration

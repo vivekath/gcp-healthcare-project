@@ -1,9 +1,26 @@
 from pyspark.sql import SparkSession
 
-def get_spark(app_name: str):
+def get_spark(app_name: str, spark_config: dict = None) -> SparkSession:
     return (
         SparkSession.builder
         .appName(app_name)
+
+        # Executors
+        .config("spark.executor.instances", spark_config.get("SPARK_EXECUTOR_INSTANCES"))   # one per worker
+        .config("spark.executor.cores", spark_config.get("SPARK_EXECUTOR_CORES"))
+        .config("spark.executor.memory", spark_config.get("SPARK_EXECUTOR_MEMORY"))
+
+        # Driver (master)
+        .config("spark.driver.memory", spark_config.get("SPARK_DRIVER_MEMORY"))
+
+        # SQL / shuffle tuning
+        .config("spark.sql.shuffle.partitions", spark_config.get("SQL_SHUFFLE_PARTITIONS"))
+        .config("spark.default.parallelism", spark_config.get("SPARK_DEFAULT_PARALLELISM"))
+
+        # BigQuery connector optimizations
+        .config("viewsEnabled", spark_config.get("VIEWS_ENABLED"))
+        .config("materializationDataset", spark_config.get("MATERIALIZATION_DATASET"))
+
         .getOrCreate()
     )
 

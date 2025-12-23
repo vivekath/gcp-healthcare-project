@@ -50,6 +50,17 @@ WORKER_DISK_SIZE = int(get_var("WORKER_DISK_SIZE"))
 IMAGE_VERSION = get_var("IMAGE_VERSION")
 INITIALIZATION_ACTIONS = get_var("INITIALIZATION_ACTIONS")
 SPARK_BIGQUERY_CONNECTOR_VERSION = get_var("SPARK_BIGQUERY_CONNECTOR_VERSION")
+
+SPARK_CONFIG = {
+    "SPARK_EXECUTOR_INSTANCES": get_var("SPARK_EXECUTOR_INSTANCES"),
+    "SPARK_EXECUTOR_CORES": get_var("SPARK_EXECUTOR_CORES"),
+    "SPARK_EXECUTOR_MEMORY": get_var("SPARK_EXECUTOR_MEMORY"),
+    "SPARK_DRIVER_MEMORY": get_var("SPARK_DRIVER_MEMORY"),
+    "SQL_SHUFFLE_PARTITIONS": get_var("SQL_SHUFFLE_PARTITIONS"),
+    "SPARK_DEFAULT_PARALLELISM": get_var("SPARK_DEFAULT_PARALLELISM"),
+    "VIEWS_ENABLED": get_var("VIEWS_ENABLED"),
+    "MATERIALIZATION_DATASET": get_var("MATERIALIZATION_DATASET"),
+}
 # -----------------------
 # PySpark job function
 # -----------------------
@@ -139,7 +150,7 @@ with DAG(
         task_id="hospitalA_ingestion",
         job=pyspark_job(
             f"gs://{COMPOSER_BUCKET}/data/INGESTION/hospitalA_mysqlToLanding.py",
-            job_args=[f"--gcs_bucket={GCS_BUCKET}", f"--project_id={PROJECT_ID}", f"--hospital_name={HOSPITAL_NAME_A}", f"--hospital_db={HOSPITAL_DB_A}", f"--mysql_host={HOSPITAL_A_MYSQL_HOST}", f"--mysql_port={HOSPITAL_A_MYSQL_PORT}"]
+            job_args=[f"--gcs_bucket={GCS_BUCKET}", f"--project_id={PROJECT_ID}", f"--hospital_name={HOSPITAL_NAME_A}", f"--hospital_db={HOSPITAL_DB_A}", f"--mysql_host={HOSPITAL_A_MYSQL_HOST}", f"--mysql_port={HOSPITAL_A_MYSQL_PORT}", f"--spark_config={SPARK_CONFIG}"]
         ),
         region=REGION,
         project_id=PROJECT_ID,
@@ -150,7 +161,7 @@ with DAG(
         task_id="hospitalB_ingestion",
         job=pyspark_job(
             f"gs://{COMPOSER_BUCKET}/data/INGESTION/hospitalB_mysqlToLanding.py",
-            job_args=[f"--gcs_bucket={GCS_BUCKET}", f"--project_id={PROJECT_ID}", f"--hospital_name={HOSPITAL_NAME_B}", f"--hospital_db={HOSPITAL_DB_B}", f"--mysql_host={HOSPITAL_B_MYSQL_HOST}", f"--mysql_port={HOSPITAL_B_MYSQL_PORT}"]
+            job_args=[f"--gcs_bucket={GCS_BUCKET}", f"--project_id={PROJECT_ID}", f"--hospital_name={HOSPITAL_NAME_B}", f"--hospital_db={HOSPITAL_DB_B}", f"--mysql_host={HOSPITAL_B_MYSQL_HOST}", f"--mysql_port={HOSPITAL_B_MYSQL_PORT}", f"--spark_config={SPARK_CONFIG}"]
         ),
         region=REGION,
         project_id=PROJECT_ID,
@@ -161,7 +172,7 @@ with DAG(
         task_id="claims_ingestion",
         job=pyspark_job(
             f"gs://{COMPOSER_BUCKET}/data/INGESTION/claims.py",
-            job_args=[f"--gcs_bucket={GCS_BUCKET}", f"--project_id={PROJECT_ID}"]
+            job_args=[f"--gcs_bucket={GCS_BUCKET}", f"--project_id={PROJECT_ID}", f"--spark_config={SPARK_CONFIG}"]
         ),
         region=REGION,
         project_id=PROJECT_ID,
@@ -172,7 +183,7 @@ with DAG(
         task_id="cpt_codes_ingestion",
         job=pyspark_job(
             f"gs://{COMPOSER_BUCKET}/data/INGESTION/cpt_codes.py",
-            job_args=[f"--gcs_bucket={GCS_BUCKET}", f"--project_id={PROJECT_ID}"]
+            job_args=[f"--gcs_bucket={GCS_BUCKET}", f"--project_id={PROJECT_ID}", f"--spark_config={SPARK_CONFIG}"]
         ),
         region=REGION,
         project_id=PROJECT_ID,
