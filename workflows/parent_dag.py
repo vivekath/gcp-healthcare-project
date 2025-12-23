@@ -5,7 +5,8 @@ from airflow.utils.dates import days_ago
 from airflow.operators.dagrun_operator import TriggerDagRunOperator
 from airflow.models import Variable
 import os
-ENV = os.getenv("ENV", "DEV")
+# ENV = os.getenv("ENV", "DEV")
+ENV = Variable.get("ENV")
 
 def get_var(key: str):
     return Variable.get(f"{ENV}_{key}")

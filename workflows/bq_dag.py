@@ -6,7 +6,8 @@ from airflow.providers.google.cloud.operators.bigquery import BigQueryInsertJobO
 import os
 from airflow.models import Variable
 
-ENV = os.getenv("ENV", "DEV")
+# ENV = os.getenv("ENV", "DEV")
+ENV = Variable.get("ENV")
 
 def get_var(key: str):
     return Variable.get(f"{ENV}_{key}")
