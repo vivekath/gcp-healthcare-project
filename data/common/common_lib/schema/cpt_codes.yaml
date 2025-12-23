@@ -1,0 +1,13 @@
+cpt_codes:  
+  - name: "procedure_code_category"
+    type: "string"
+    nullable: true
+  - name: "cpt_codes"
+    type: "string"
+    nullable: true
+  - name: "procedure_code_descriptions"
+    type: "string"
+    nullable: true
+  - name: "code_status"
+    type: "string"
+    nullable: true

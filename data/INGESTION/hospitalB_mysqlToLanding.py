@@ -16,6 +16,7 @@ from common_lib.config_utils import (
     save_logs_to_bigquery
 )
 from common_lib.constants import Constants
+from common_lib.config_utils import load_schema_from_yaml
 
 
 # =============================================================================
@@ -109,15 +110,7 @@ MYSQL_CONFIG = {
 # Read Configuration File
 # =============================================================================
 def read_config_file():
-    pipeline_config_schema = StructType([
-        StructField("database", StringType(), False),     
-        StructField("datasource", StringType(), False),    
-        StructField("tablename", StringType(), False),     
-        StructField("loadtype", StringType(), False),       
-        StructField("watermark", StringType(), True),      
-        StructField("is_active", IntegerType(), False),     
-        StructField("targetpath", StringType(), False)     
-        ])
+    pipeline_config_schema = load_schema_from_yaml("schema/pipeline_config.yaml", "pipeline_config")
     df = read_csv(spark, CONFIG_FILE_PATH, header=True,schema=pipeline_config_schema)
     log_event(
         Constants.Logger.INFO,

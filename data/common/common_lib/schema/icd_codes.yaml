@@ -1,0 +1,19 @@
+icd_codes:
+  - name: "icd_code"
+    type: "string"
+    nullable: true
+  - name: "icd_code_type"
+    type: "string"
+    nullable: true
+  - name: "code_description"
+    type: "string"
+    nullable: true
+  - name: "inserted_date"
+    type: "date"
+    nullable: true
+  - name: "updated_date"
+    type: "date"
+    nullable: true
+  - name: "is_current_flag"
+    type: "boolean"
+    nullable: true

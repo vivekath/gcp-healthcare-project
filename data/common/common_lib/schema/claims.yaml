@@ -1,0 +1,58 @@
+claims:
+  - name: "ClaimID"
+    type: "string"
+    nullable: true
+  - name: "TransactionID"
+    type: "string"
+    nullable: true
+  - name: "PatientID"
+    type: "string"
+    nullable: true
+  - name: "EncounterID"
+    type: "string"
+    nullable: true
+  - name: "ProviderID"
+    type: "string"
+    nullable: true
+  - name: "DeptID"
+    type: "string"
+    nullable: true
+  - name: "ServiceDate"
+    type: "string"
+    nullable: true
+  - name: "ClaimDate"
+    type: "string"
+    nullable: true
+  - name: "PayorID"
+    type: "string"
+    nullable: true
+  - name: "ClaimAmount"
+    type: "float"
+    nullable: true
+  - name: "PaidAmount"
+    type: "float"
+    nullable: true
+  - name: "ClaimStatus"
+    type: "string"
+    nullable: true
+  - name: "PayorType"
+    type: "string"
+    nullable: true
+  - name: "Deductible"
+    type: "float"
+    nullable: true
+  - name: "Coinsurance"
+    type: "float"
+    nullable: true
+  - name: "Copay"
+    type: "float"
+    nullable: true
+  - name: "InsertDate"
+    type: "string"
+    nullable: true
+  - name: "ModifiedDate"
+    type: "string"
+    nullable: true
+  - name: "datasource"
+    type: "string"
+    nullable: false

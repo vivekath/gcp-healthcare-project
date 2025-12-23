@@ -4,7 +4,12 @@ import datetime
 import json
 from .gcs_utils import upload_string
 from .constants import Constants
-from pyspark.sql.types import StructType, StructField, StringType, IntegerType,TimestampType
+from pyspark.sql.types import (
+    StructType, StructField, StringType, FloatType,
+    IntegerType,LongType,DoubleType,DateType,TimestampType,
+   BooleanType, BinaryType
+)
+import yaml
 
 # Initialize Google Cloud Logging
 logging_client = google.cloud.logging.Client()
@@ -68,3 +73,35 @@ def save_logs_to_bigquery(spark, bq_log_table, bq_temp_path):
             .mode("append") \
             .save()
         print("✅ Logs stored in BigQuery for future analysis")
+
+
+def load_schema_from_yaml(yaml_filepath: str, schema_name: str) -> StructType:
+    type_map = {
+        "string": StringType(),
+        "float": FloatType(),
+        "integer": IntegerType(),
+        "bigint": LongType(),
+        "double": DoubleType(),
+        "date": DateType(),
+        "timestamp": TimestampType(),
+        "boolean": BooleanType(),
+        "binary": BinaryType(),
+    }
+
+    with open(yaml_filepath, "r") as file:
+        config = yaml.safe_load(file)
+
+    if schema_name not in config:
+        raise ValueError(f"Schema '{schema_name}' not found in {yaml_filepath}")
+
+    fields = []
+    for field in config[schema_name]:
+        fields.append(
+            StructField(
+                field["name"],
+                type_map.get(field["type"].lower(), StringType()),
+                field.get("nullable", True)
+            )
+        )
+
+    return StructType(fields)

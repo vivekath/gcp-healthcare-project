@@ -6,10 +6,7 @@ import argparse
 from common_lib.spark_utils import get_spark, read_csv
 from common_lib.constants import Constants
 import json
-from pyspark.sql.types import (
-    StructType, StructField,
-    StringType
-)
+from common_lib.config_utils import load_schema_from_yaml
 
 
 # =============================================================================
@@ -43,12 +40,7 @@ BQ_TEMP_PATH = Constants.BQ.TEMP_PATH.format(gcs_bucket=GCS_BUCKET)
 # =============================================================================
 # Read CPT Codes Data
 # =============================================================================
-cpt_codes_schema = StructType([
-    StructField("procedure_code_category", StringType(), True),
-    StructField("cpt_codes", StringType(), True),
-    StructField("procedure_code_descriptions", StringType(), True),
-    StructField("code_status", StringType(), True)
-])
+cpt_codes_schema = load_schema_from_yaml("schema/cpt_codes.yaml", "cpt_codes")
 cpt_code_df = read_csv(spark, CPT_BUCKET_PATH, header=True, schema=cpt_codes_schema)
 
 

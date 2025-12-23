@@ -1,0 +1,22 @@
+pipeline_config:
+  - name: "database"
+    type: "string"
+    nullable: false
+  - name: "datasource"
+    type: "string"
+    nullable: false
+  - name: "tablename"
+    type: "string"
+    nullable: false
+  - name: "loadtype"
+    type: "string"
+    nullable: false
+  - name: "watermark"
+    type: "string"
+    nullable: true
+  - name: "is_active"
+    type: "integer"
+    nullable: false
+  - name: "targetpath"
+    type: "string"
+    nullable: false

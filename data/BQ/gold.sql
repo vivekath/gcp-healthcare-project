@@ -42,7 +42,7 @@ CREATE TABLE IF NOT EXISTS `quantum-episode-345713.gold_dataset.FACT_PATIENT_HIS
     BilledAmount FLOAT64,
     PaidAmount FLOAT64,
     ClaimStatus STRING,
-    ClaimAmount STRING,
+    ClaimAmount FLOAT64,
     ClaimPaidAmount STRING,
     PayorType STRING
 );

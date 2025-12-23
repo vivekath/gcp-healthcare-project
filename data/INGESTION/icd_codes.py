@@ -2,7 +2,7 @@ import requests
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import current_date, lit
 from datetime import datetime
-from pyspark.sql.types import StructType, StructField, StringType, DateType, BooleanType
+from common_lib.config_utils import load_schema_from_yaml
 
 # Constants
 CLIENT_ID = '09bf0f21-9dc3-41e0-966e-8ae3d476cc42_17a6ae0c-9a45-422d-a28b-796746818192'
@@ -68,16 +68,8 @@ headers = {
 icd_codes = extract_codes(ROOT_URL, headers)
 
 # Define schema
-schema = StructType([
-    StructField("icd_code", StringType(), True),
-    StructField("icd_code_type", StringType(), True),
-    StructField("code_description", StringType(), True),
-    StructField("inserted_date", DateType(), True),
-    StructField("updated_date", DateType(), True),
-    StructField("is_current_flag", BooleanType(), True)
-])
 
-# Initialize Spark session
+icd_codes_schema = load_schema_from_yaml("schema/icd_codes.yaml", "icd_codes")
 spark = SparkSession.builder.appName("ICD_Codes_Extraction").getOrCreate()
 
 # Create DataFrame
