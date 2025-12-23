@@ -5,7 +5,7 @@ from google.cloud import storage
 import datetime
 import argparse
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType,TimestampType
-
+import json
 # Common utilities
 from common_lib.spark_utils import get_spark, read_csv
 from common_lib.bq_utils import get_bq_client, run_query
@@ -27,7 +27,7 @@ parser.add_argument("--hospital_name", required=True, help="Hospital name")
 parser.add_argument("--hospital_db", required=True, help="Hospital database name")
 parser.add_argument("--mysql_host", required=True, help="MySQL host address")
 parser.add_argument("--mysql_port", required=True, help="MySQL port number")
-parser.add_argument("--spark_config", required=True, help="Spark configuration")
+parser.add_argument("--spark_config", required=True, help="Spark configuration", type=str)
 args = parser.parse_args()
 
 
@@ -77,11 +77,10 @@ bucket = storage_client.bucket(GCS_BUCKET)
 # =============================================================================
 # Spark Initialization
 # =============================================================================
-spark_config = args.spark_config
-
+spark_config_dict = json.loads(args.spark_config)
 spark = get_spark(
     Constants.Common.APP_NAME.format(hospital_name=HOSPITAL_NAME),
-    spark_config=spark_config
+    spark_config=spark_config_dict
 )
 
 

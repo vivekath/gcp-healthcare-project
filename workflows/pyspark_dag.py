@@ -4,6 +4,7 @@ import os
 from airflow.models import Variable
 from datetime import datetime, timedelta
 from airflow.utils.dates import days_ago
+import json
 
 ENV = os.getenv("ENV", "DEV")
 
@@ -61,6 +62,8 @@ SPARK_CONFIG = {
     "VIEWS_ENABLED": get_var("VIEWS_ENABLED"),
     "MATERIALIZATION_DATASET": get_var("MATERIALIZATION_DATASET"),
 }
+spark_config_json = json.dumps(SPARK_CONFIG)
+
 # -----------------------
 # PySpark job function
 # -----------------------
@@ -129,13 +132,13 @@ with DAG(
 ) as dag:
 
     # Create cluster
-    create_cluster = DataprocCreateClusterOperator(
-        task_id="create_cluster",
-        project_id=PROJECT_ID,
-        cluster_config=CLUSTER_CONFIG,
-        region=REGION,
-        cluster_name=CLUSTER_NAME,
-    )
+    # create_cluster = DataprocCreateClusterOperator(
+    #     task_id="create_cluster",
+    #     project_id=PROJECT_ID,
+    #     cluster_config=CLUSTER_CONFIG,
+    #     region=REGION,
+    #     cluster_name=CLUSTER_NAME,
+    # )
 
     #     # define the Tasks
     # start_cluster = DataprocStartClusterOperator(
@@ -150,7 +153,7 @@ with DAG(
         task_id="hospitalA_ingestion",
         job=pyspark_job(
             f"gs://{COMPOSER_BUCKET}/data/INGESTION/hospitalA_mysqlToLanding.py",
-            job_args=[f"--gcs_bucket={GCS_BUCKET}", f"--project_id={PROJECT_ID}", f"--hospital_name={HOSPITAL_NAME_A}", f"--hospital_db={HOSPITAL_DB_A}", f"--mysql_host={HOSPITAL_A_MYSQL_HOST}", f"--mysql_port={HOSPITAL_A_MYSQL_PORT}", f"--spark_config={SPARK_CONFIG}"]
+            job_args=[f"--gcs_bucket={GCS_BUCKET}", f"--project_id={PROJECT_ID}", f"--hospital_name={HOSPITAL_NAME_A}", f"--hospital_db={HOSPITAL_DB_A}", f"--mysql_host={HOSPITAL_A_MYSQL_HOST}", f"--mysql_port={HOSPITAL_A_MYSQL_PORT}", f"--spark_config={spark_config_json}"]
         ),
         region=REGION,
         project_id=PROJECT_ID,
@@ -161,7 +164,7 @@ with DAG(
         task_id="hospitalB_ingestion",
         job=pyspark_job(
             f"gs://{COMPOSER_BUCKET}/data/INGESTION/hospitalB_mysqlToLanding.py",
-            job_args=[f"--gcs_bucket={GCS_BUCKET}", f"--project_id={PROJECT_ID}", f"--hospital_name={HOSPITAL_NAME_B}", f"--hospital_db={HOSPITAL_DB_B}", f"--mysql_host={HOSPITAL_B_MYSQL_HOST}", f"--mysql_port={HOSPITAL_B_MYSQL_PORT}", f"--spark_config={SPARK_CONFIG}"]
+            job_args=[f"--gcs_bucket={GCS_BUCKET}", f"--project_id={PROJECT_ID}", f"--hospital_name={HOSPITAL_NAME_B}", f"--hospital_db={HOSPITAL_DB_B}", f"--mysql_host={HOSPITAL_B_MYSQL_HOST}", f"--mysql_port={HOSPITAL_B_MYSQL_PORT}", f"--spark_config={spark_config_json}"]
         ),
         region=REGION,
         project_id=PROJECT_ID,
@@ -172,7 +175,7 @@ with DAG(
         task_id="claims_ingestion",
         job=pyspark_job(
             f"gs://{COMPOSER_BUCKET}/data/INGESTION/claims.py",
-            job_args=[f"--gcs_bucket={GCS_BUCKET}", f"--project_id={PROJECT_ID}", f"--spark_config={SPARK_CONFIG}"]
+            job_args=[f"--gcs_bucket={GCS_BUCKET}", f"--project_id={PROJECT_ID}", f"--spark_config={spark_config_json}"]
         ),
         region=REGION,
         project_id=PROJECT_ID,
@@ -183,7 +186,7 @@ with DAG(
         task_id="cpt_codes_ingestion",
         job=pyspark_job(
             f"gs://{COMPOSER_BUCKET}/data/INGESTION/cpt_codes.py",
-            job_args=[f"--gcs_bucket={GCS_BUCKET}", f"--project_id={PROJECT_ID}", f"--spark_config={SPARK_CONFIG}"]
+            job_args=[f"--gcs_bucket={GCS_BUCKET}", f"--project_id={PROJECT_ID}", f"--spark_config={spark_config_json}"]
         ),
         region=REGION,
         project_id=PROJECT_ID,
@@ -209,46 +212,5 @@ with DAG(
     # Task Dependencies
     # -----------------------
     # create_cluster >> task_1 >> task_2 >> task_3 >> task_4 >> stop_cluster >> delete_cluster
-    create_cluster >> task_1 >> task_2 >> task_3 >> task_4
-
-
-
-# ✅ Recommended Cluster Configuration for 100M rows/day
-"""
-CLUSTER_CONFIG = ClusterGenerator(
-    project_id=PROJECT_ID,
-    region=REGION,
-    cluster_name=CLUSTER_NAME,
-
-    # Bigger machines
-    master_machine_type="n1-standard-4",
-    worker_machine_type="n1-standard-4",
-
-    # More workers for parallelism
-    num_workers=3,
-
-    # Add preemptible for cheap compute
-    num_preemptible_workers=2,
-    preemptible_worker_machine_type="n1-standard-4",
-
-    # Disks
-    master_disk_size=100,
-    worker_disk_size=100,
-
-    # Image version
-    image_version="2.1-debian11",
-
-    optional_components=["JUPYTER"],
-    enable_component_gateway=True,
-
-    initialization_actions=[
-        "gs://goog-dataproc-initialization-actions-us-east1/connectors/connectors.sh"
-    ],
-
-    metadata={
-        "bigquery-connector-version": "1.2.0",
-        "spark-bigquery-connector-version": "0.34.0",  # latest stable
-    },
-
-).make()
-"""
+    # create_cluster >> task_1 >> task_2 >> task_3 >> task_4
+    task_1 >> task_2 >> task_3 >> task_4
