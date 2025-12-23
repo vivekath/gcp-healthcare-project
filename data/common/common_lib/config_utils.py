@@ -10,6 +10,7 @@ from pyspark.sql.types import (
    BooleanType, BinaryType
 )
 import yaml
+import pkgutil
 
 # Initialize Google Cloud Logging
 logging_client = google.cloud.logging.Client()
@@ -75,7 +76,7 @@ def save_logs_to_bigquery(spark, bq_log_table, bq_temp_path):
         print("✅ Logs stored in BigQuery for future analysis")
 
 
-def load_schema_from_yaml(yaml_filepath: str, schema_name: str) -> StructType:
+def load_schema_from_yaml(resource_path: str, schema_name: str):
     type_map = {
         "string": StringType(),
         "float": FloatType(),
@@ -88,11 +89,11 @@ def load_schema_from_yaml(yaml_filepath: str, schema_name: str) -> StructType:
         "binary": BinaryType(),
     }
 
-    with open(yaml_filepath, "r") as file:
-        config = yaml.safe_load(file)
+    data = pkgutil.get_data("common_lib", resource_path)
+    if data is None:
+        raise FileNotFoundError(f"Schema file not found: {resource_path}")
 
-    if schema_name not in config:
-        raise ValueError(f"Schema '{schema_name}' not found in {yaml_filepath}")
+    config = yaml.safe_load(data.decode("utf-8"))
 
     fields = []
     for field in config[schema_name]:
