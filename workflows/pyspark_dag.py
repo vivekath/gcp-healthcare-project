@@ -132,13 +132,13 @@ with DAG(
 ) as dag:
 
     # Create cluster
-    # create_cluster = DataprocCreateClusterOperator(
-    #     task_id="create_cluster",
-    #     project_id=PROJECT_ID,
-    #     cluster_config=CLUSTER_CONFIG,
-    #     region=REGION,
-    #     cluster_name=CLUSTER_NAME,
-    # )
+    create_cluster = DataprocCreateClusterOperator(
+        task_id="create_cluster",
+        project_id=PROJECT_ID,
+        cluster_config=CLUSTER_CONFIG,
+        region=REGION,
+        cluster_name=CLUSTER_NAME,
+    )
 
     #     # define the Tasks
     # start_cluster = DataprocStartClusterOperator(
@@ -193,24 +193,24 @@ with DAG(
     )
 
     # # Stop cluster
-    # stop_cluster = DataprocStopClusterOperator(
-    #     task_id="stop_cluster",
-    #     project_id=PROJECT_ID,
-    #     region=REGION,
-    #     cluster_name=CLUSTER_NAME,
-    # )
+    stop_cluster = DataprocStopClusterOperator(
+        task_id="stop_cluster",
+        project_id=PROJECT_ID,
+        region=REGION,
+        cluster_name=CLUSTER_NAME,
+    )
 
     # # Delete cluster
-    # delete_cluster = DataprocDeleteClusterOperator(
-    #     task_id="delete_cluster",
-    #     project_id=PROJECT_ID,
-    #     region=REGION,
-    #     cluster_name=CLUSTER_NAME,
-    # )
+    delete_cluster = DataprocDeleteClusterOperator(
+        task_id="delete_cluster",
+        project_id=PROJECT_ID,
+        region=REGION,
+        cluster_name=CLUSTER_NAME,
+    )
 
     # -----------------------
     # Task Dependencies
     # -----------------------
-    # create_cluster >> task_1 >> task_2 >> task_3 >> task_4 >> stop_cluster >> delete_cluster
+    create_cluster >> task_1 >> task_2 >> task_3 >> task_4 >> stop_cluster >> delete_cluster
     # create_cluster >> task_1 >> task_2 >> task_3 >> task_4
-    task_1 >> task_2 >> task_3 >> task_4
+    # task_1 >> task_2 >> task_3 >> task_4
