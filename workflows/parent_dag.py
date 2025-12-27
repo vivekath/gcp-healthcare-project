@@ -64,4 +64,4 @@ with DAG(
     )
 
 # Define dependencies
-trigger_pyspark_dag >> trigger_bigquery_dag
+[trigger_dataflow_dag, trigger_pyspark_dag] >> trigger_bigquery_dag
