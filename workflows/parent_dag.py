@@ -46,7 +46,7 @@ with DAG(
     trigger_dataflow_dag = TriggerDagRunOperator(
         task_id="trigger_dataflow_dag",
         trigger_dag_id="dataflow_dag",
-        wait_for_completion=True,
+        wait_for_completion=False,
     )
 
     # Task to trigger PySpark DAG

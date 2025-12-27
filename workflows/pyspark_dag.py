@@ -133,13 +133,13 @@ with DAG(
 ) as dag:
 
     # Create cluster
-    create_cluster = DataprocCreateClusterOperator(
-        task_id="create_cluster",
-        project_id=PROJECT_ID,
-        cluster_config=CLUSTER_CONFIG,
-        region=REGION,
-        cluster_name=CLUSTER_NAME,
-    )
+    # create_cluster = DataprocCreateClusterOperator(
+    #     task_id="create_cluster",
+    #     project_id=PROJECT_ID,
+    #     cluster_config=CLUSTER_CONFIG,
+    #     region=REGION,
+    #     cluster_name=CLUSTER_NAME,
+    # )
 
     #     # define the Tasks
     # start_cluster = DataprocStartClusterOperator(
@@ -213,5 +213,5 @@ with DAG(
     # Task Dependencies
     # -----------------------
     # create_cluster >> task_1 >> task_2 >> task_3 >> task_4 >> stop_cluster >> delete_cluster
-    create_cluster >> task_1 >> task_2 >> task_3 >> task_4
-    # task_1 >> task_2 >> task_3 >> task_4
+    # create_cluster >> task_1 >> task_2 >> task_3 >> task_4
+    task_1 >> task_2 >> task_3 >> task_4
