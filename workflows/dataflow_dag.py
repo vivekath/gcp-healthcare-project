@@ -1,28 +1,22 @@
 from airflow import DAG
 from airflow.models import Variable
-from airflow.providers.apache.beam.operators.beam import (
-    BeamRunPythonPipelineOperator
-)
+from airflow.providers.apache.beam.operators.beam import BeamRunPythonPipelineOperator
 from airflow.utils.dates import days_ago
 from datetime import datetime, timedelta
-
 
 # =============================================================================
 # ENV & helpers
 # =============================================================================
 ENV = Variable.get("ENV")
 
-
 def get_var(key):
     return Variable.get(f"{ENV}_{key}")
-
 
 def get_start_date():
     start_date_str = get_var("DAG_START_DATE")
     if start_date_str:
         return datetime.strptime(start_date_str, "%Y-%m-%d")
     return days_ago(1)
-
 
 # =============================================================================
 # Airflow Variables
@@ -31,7 +25,6 @@ PROJECT_ID = get_var("PROJECT_ID")
 REGION = get_var("REGION")
 COMPOSER_BUCKET = get_var("COMPOSER_BUCKET")
 GCS_BUCKET = get_var("DATAFLOW_GCS_BUCKET")
-
 
 # =============================================================================
 # DAG default args
@@ -48,7 +41,6 @@ ARGS = {
     "retry_delay": timedelta(minutes=int(get_var("RETRY_DELAY_MINUTES"))),
 }
 
-
 # =============================================================================
 # DAG definition
 # =============================================================================
@@ -61,12 +53,15 @@ with DAG(
     tags=["dataflow", "beam"],
 ) as dag:
 
+    common_lib_zip = f"gs://{COMPOSER_BUCKET}/data/common/common_lib.zip"
+
     # -------------------------------------------------------------------------
     # Transactions pipeline
     # -------------------------------------------------------------------------
     transactions_pipeline = BeamRunPythonPipelineOperator(
         task_id="transactions_dataflow_job",
         py_file=f"gs://{COMPOSER_BUCKET}/data/INGESTION/transactions_pipeline.py",
+        py_files=[common_lib_zip],  # Include common_lib
         pipeline_options={
             "project": PROJECT_ID,
             "region": REGION,
@@ -86,7 +81,7 @@ with DAG(
     retail_sales_pipeline = BeamRunPythonPipelineOperator(
         task_id="retail_sales_dataflow_job",
         py_file=f"gs://{COMPOSER_BUCKET}/data/INGESTION/retail_sales_pipeline.py",
-        
+        py_files=[common_lib_zip],  # Include common_lib
         pipeline_options={
             "project": PROJECT_ID,
             "region": REGION,
@@ -102,5 +97,4 @@ with DAG(
     # -------------------------------------------------------------------------
     # Task dependencies
     # -------------------------------------------------------------------------
-    transactions_pipeline >> retail_sales_pipeline 
-    # [transactions_pipeline, retail_sales_pipeline]
+    transactions_pipeline >> retail_sales_pipeline
