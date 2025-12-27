@@ -1,7 +1,7 @@
 from airflow import DAG
 from airflow.models import Variable
-from airflow.providers.google.cloud.operators.dataflow import (
-    DataflowStartPythonJobOperator
+from airflow.providers.apache.beam.operators.beam import (
+    BeamRunPythonPipelineOperator
 )
 from airflow.utils.dates import days_ago
 from datetime import datetime, timedelta
@@ -64,14 +64,14 @@ with DAG(
     # -------------------------------------------------------------------------
     # Transactions pipeline
     # -------------------------------------------------------------------------
-    transactions_pipeline = DataflowStartPythonJobOperator(
+    transactions_pipeline = BeamRunPythonPipelineOperator(
         task_id="transactions_dataflow_job",
         py_file=f"gs://{COMPOSER_BUCKET}/data/INGESTION/transactions_pipeline.py",
-        job_name="transactions-usecase-{{ ts_nodash }}",
-        options={
+        pipeline_options={
             "project": PROJECT_ID,
             "region": REGION,
             "runner": "DataflowRunner",
+            "job_name": "transactions-usecase-{{ ts_nodash }}",
             "temp_location": f"gs://{GCS_BUCKET}/temp/",
             "staging_location": f"gs://{GCS_BUCKET}/staging/",
             # custom args
@@ -83,14 +83,15 @@ with DAG(
     # -------------------------------------------------------------------------
     # Retail sales pipeline
     # -------------------------------------------------------------------------
-    retail_sales_pipeline = DataflowStartPythonJobOperator(
+    retail_sales_pipeline = BeamRunPythonPipelineOperator(
         task_id="retail_sales_dataflow_job",
         py_file=f"gs://{COMPOSER_BUCKET}/data/INGESTION/retail_sales_pipeline.py",
-        job_name="retail-sales-usecase-{{ ts_nodash }}",
-        options={
+        
+        pipeline_options={
             "project": PROJECT_ID,
             "region": REGION,
             "runner": "DataflowRunner",
+            "job_name": "retail-sales-usecase-{{ ts_nodash }}",
             "temp_location": f"gs://{GCS_BUCKET}/temp/",
             "staging_location": f"gs://{GCS_BUCKET}/staging/",
             # custom args
