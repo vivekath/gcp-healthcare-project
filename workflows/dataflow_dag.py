@@ -79,7 +79,7 @@ with DAG(
             "project": PROJECT_ID,
             "region": REGION,
             "runner": "DataflowRunner",
-            "job_name": "transactions",
+            "job_name": "retail_sales",
             "temp_location": f"gs://{GCS_BUCKET}/temp/",
             "staging_location": f"gs://{GCS_BUCKET}/staging/",
         },
