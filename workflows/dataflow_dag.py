@@ -47,7 +47,7 @@ ARGS = {
 with DAG(
     dag_id="dataflow_dag",
     default_args=ARGS,
-    schedule_interval=None,   # or cron
+    schedule_interval=get_var("SCHEDULE_INTERVAL"),   # or cron
     description="This is a dataflow dag",
     catchup=False,
     tags=["dataflow", "beam"],
@@ -59,17 +59,6 @@ with DAG(
     transactions_pipeline = BeamRunPythonPipelineOperator(
         task_id="transactions_dataflow_job",
         py_file=f"gs://{COMPOSER_BUCKET}/data/INGESTION/transactions_pipeline.py",
-        pipeline_options={
-            "project": PROJECT_ID,
-            "region": REGION,
-            "runner": "DataflowRunner",
-            "job_name": "transactions",
-            "temp_location": f"gs://{GCS_BUCKET}/temp/",
-            "staging_location": f"gs://{GCS_BUCKET}/staging/",
-            # custom args
-            "gcs_bucket": GCS_BUCKET,
-            "project_id": PROJECT_ID,
-        },
     )
 
     # -------------------------------------------------------------------------
@@ -78,20 +67,9 @@ with DAG(
     retail_sales_pipeline = BeamRunPythonPipelineOperator(
         task_id="retail_sales_dataflow_job",
         py_file=f"gs://{COMPOSER_BUCKET}/data/INGESTION/retail_sales_pipeline.py",
-        pipeline_options={
-            "project": PROJECT_ID,
-            "region": REGION,
-            "runner": "DataflowRunner",
-            "job_name": "retail_sales",
-            "temp_location": f"gs://{GCS_BUCKET}/temp/",
-            "staging_location": f"gs://{GCS_BUCKET}/staging/",
-            # custom args
-            # "gcs_bucket": GCS_BUCKET,
-            # "project_id": PROJECT_ID,
-        },
     )
 
     # -------------------------------------------------------------------------
     # Task dependencies
     # -------------------------------------------------------------------------
-    transactions_pipeline >> retail_sales_pipeline
+    [transactions_pipeline, retail_sales_pipeline]
