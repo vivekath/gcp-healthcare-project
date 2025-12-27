@@ -34,9 +34,17 @@ class ValidateAndTransform(beam.DoFn):
             yield beam.pvalue.TaggedOutput("invalid_records", element)
 
 def run():
-    GCS_BUCKET = "dataflow-bkt-26122025"
-    BQ_PROJECT = "quantum-episode-345713"
-    REGION = "us-east1"
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--gcs_bucket", required=True)
+    parser.add_argument("--project_id", required=True)
+    args, beam_args = parser.parse_known_args()
+    GCS_BUCKET = args.gcs_bucket
+    BQ_PROJECT = args.project_id
+
+    # GCS_BUCKET = "dataflow-bkt-26122025"
+    # BQ_PROJECT = "quantum-episode-345713"
 
     csv_source_path = f"gs://{GCS_BUCKET}/transactions.csv"
     sink_invalid_path = f"gs://{GCS_BUCKET}/invalid/transactions_invalid"
@@ -52,14 +60,15 @@ def run():
         "total_sales:FLOAT64"
     )
 
-    pipeline_options = PipelineOptions(
-        runner="DataflowRunner",
-        project=BQ_PROJECT,
-        region=REGION,
-        job_name="transactions-{{ ts_nodash | lower }}",
-        temp_location=f"gs://{GCS_BUCKET}/temp/",
-        staging_location=f"gs://{GCS_BUCKET}/staging/"
-    )
+    pipeline_options = PipelineOptions(beam_args)
+    # pipeline_options = PipelineOptions(
+    #     runner="DataflowRunner",
+    #     project=BQ_PROJECT,
+    #     region="us-east1",
+    #     job_name="transactions",
+    #     temp_location=f"gs://{GCS_BUCKET}/temp/",
+    #     staging_location=f"gs://{GCS_BUCKET}/staging/"
+    # )
 
     with beam.Pipeline(options=pipeline_options) as pipeline:
         pc1 = pipeline | "Read CSV" >> beam.io.ReadFromText(csv_source_path, skip_header_lines=1)

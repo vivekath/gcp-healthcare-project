@@ -7,6 +7,7 @@ import argparse
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("RetailSalesPipeline")
 
+
 class ValidateAndTransform(beam.DoFn):
     def __init__(self):
         self.invalid_records = Metrics.counter(self.__class__, 'invalid_records')
@@ -48,9 +49,17 @@ class SumSalesPerCategory(beam.DoFn):
 
 
 def run():
+    # import argparse
+
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument("--gcs_bucket", required=True)
+    # parser.add_argument("--project_id", required=True)
+    # args, beam_args = parser.parse_known_args()
+    # GCS_BUCKET = args.gcs_bucket
+    # BQ_PROJECT = args.project_id
+
     GCS_BUCKET = "dataflow-bkt-26122025"
     BQ_PROJECT = "quantum-episode-345713"
-    REGION = "us-east1"
 
     csv_source_path = f"gs://{GCS_BUCKET}/sales_data.csv"
     csv_destination_path = f"gs://{GCS_BUCKET}/sales_output"
@@ -59,8 +68,8 @@ def run():
     pipeline_options = PipelineOptions(
         runner="DataflowRunner",
         project=BQ_PROJECT,
-        region=REGION,
-        job_name="retail_sales-{{ ts_nodash | lower }}",
+        region="us-east1",
+        job_name="retail_sales",
         temp_location=f"gs://{GCS_BUCKET}/temp/",
         staging_location=f"gs://{GCS_BUCKET}/staging/"
     )
