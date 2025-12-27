@@ -49,27 +49,25 @@ class SumSalesPerCategory(beam.DoFn):
 
 
 def run():
-    # import argparse
+    import argparse
 
-    # parser = argparse.ArgumentParser()
-    # parser.add_argument("--gcs_bucket", required=True)
-    # parser.add_argument("--project_id", required=True)
-    # args, beam_args = parser.parse_known_args()
-    # GCS_BUCKET = args.gcs_bucket
-    # BQ_PROJECT = args.project_id
-
-    GCS_BUCKET = "dataflow-bkt-26122025"
-    BQ_PROJECT = "quantum-episode-345713"
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--gcs_bucket", required=True)
+    parser.add_argument("--project_id", required=True)
+    args, beam_args = parser.parse_known_args()
+    GCS_BUCKET = args.gcs_bucket
 
     csv_source_path = f"gs://{GCS_BUCKET}/sales_data.csv"
     csv_destination_path = f"gs://{GCS_BUCKET}/sales_output"
+    BQ_PROJECT = args.project_id
+
 
     # pipeline_options = PipelineOptions(beam_args)
     pipeline_options = PipelineOptions(
         runner="DataflowRunner",
         project=BQ_PROJECT,
         region="us-east1",
-        job_name="retail_sales",
+        job_name="usecase1",
         temp_location=f"gs://{GCS_BUCKET}/temp/",
         staging_location=f"gs://{GCS_BUCKET}/staging/"
     )
