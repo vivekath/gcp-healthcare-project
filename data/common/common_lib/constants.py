@@ -36,6 +36,7 @@ class Constants:
     
     class BQ:
         AUDIT_LOG_TABLE = "{bq_project}.temp_dataset.audit_log"
+        VALID_TRANSACTIONS_TABLE = "{bq_project}.temp_dataset.transactions_valid"
         PIPELINE_LOGS_TABLE = "{bq_project}.temp_dataset.pipeline_logs"
         TEMP_PATH = "{gcs_bucket}/temp/"
         CLAIMS_TABLE = "{bq_project}.bronze_dataset.claims"

@@ -24,7 +24,7 @@ PARENT_ARGS = {
     "owner": get_var("OWNER"),
     "start_date": get_start_date(),
     "depends_on_past": False,
-    "email_on_failure": False,
+    "email_on_failure": True,
     "email_on_retry": False,
     "email": get_var("EMAIL").split(","),
     "email_on_success": False,
@@ -41,6 +41,13 @@ with DAG(
     catchup=False,
     tags=get_var("PARENT_DAG_TAGS").split(",")
 ) as dag:
+    
+    # Task to trigger Dataflow DAG
+    trigger_dataflow_dag = TriggerDagRunOperator(
+        task_id="trigger_dataflow_dag",
+        trigger_dag_id="dataflow_dag",
+        wait_for_completion=True,
+    )
 
     # Task to trigger PySpark DAG
     trigger_pyspark_dag = TriggerDagRunOperator(

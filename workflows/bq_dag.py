@@ -37,7 +37,7 @@ ARGS = {
      "owner": get_var("OWNER"),
     "start_date": get_start_date(),
     "depends_on_past": False,
-    "email_on_failure": False,
+    "email_on_failure": True,
     "email_on_retry": False,
     "email": get_var("EMAIL").split(","),
     "email_on_success": False,

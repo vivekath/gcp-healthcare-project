@@ -112,7 +112,7 @@ ARGS = {
     "owner": get_var("OWNER"),
     "start_date": get_start_date(),
     "depends_on_past": False,
-    "email_on_failure": False,
+    "email_on_failure": True,
     "email_on_retry": False,
     "email": get_var("EMAIL").split(","),
     "email_on_success": False,
@@ -194,24 +194,24 @@ with DAG(
     )
 
     # # Stop cluster
-    stop_cluster = DataprocStopClusterOperator(
-        task_id="stop_cluster",
-        project_id=PROJECT_ID,
-        region=REGION,
-        cluster_name=CLUSTER_NAME,
-    )
+    # stop_cluster = DataprocStopClusterOperator(
+    #     task_id="stop_cluster",
+    #     project_id=PROJECT_ID,
+    #     region=REGION,
+    #     cluster_name=CLUSTER_NAME,
+    # )
 
-    # # Delete cluster
-    delete_cluster = DataprocDeleteClusterOperator(
-        task_id="delete_cluster",
-        project_id=PROJECT_ID,
-        region=REGION,
-        cluster_name=CLUSTER_NAME,
-    )
+    # # # Delete cluster
+    # delete_cluster = DataprocDeleteClusterOperator(
+    #     task_id="delete_cluster",
+    #     project_id=PROJECT_ID,
+    #     region=REGION,
+    #     cluster_name=CLUSTER_NAME,
+    # )
 
     # -----------------------
     # Task Dependencies
     # -----------------------
-    create_cluster >> task_1 >> task_2 >> task_3 >> task_4 >> stop_cluster >> delete_cluster
-    # create_cluster >> task_1 >> task_2 >> task_3 >> task_4
+    # create_cluster >> task_1 >> task_2 >> task_3 >> task_4 >> stop_cluster >> delete_cluster
+    create_cluster >> task_1 >> task_2 >> task_3 >> task_4
     # task_1 >> task_2 >> task_3 >> task_4

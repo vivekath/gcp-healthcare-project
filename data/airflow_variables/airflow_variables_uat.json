@@ -1,10 +1,11 @@
 {
   "UAT_PROJECT_ID": "quantum-episode-345713",
   "UAT_REGION": "us-east1",
-  "UAT_COMPOSER_BUCKET": "us-central1-demo-instance-2285d85b-bucket",
+  "UAT_COMPOSER_BUCKET": "us-central1-demo-instance-839a4a55-bucket",
   "UAT_CLUSTER_NAME": "my-demo-cluster2",
   "UAT_BQ_JAR": "gs://spark-lib/bigquery/spark-bigquery-with-dependencies_2.12-0.36.1.jar",
   "UAT_GCS_BUCKET": "healthcare-bucket-20122025",
+  "UAT_DATAFLOW_GCS_BUCKET": "dataflow-bkt-26122025",
   "UAT_HOSPITAL_NAME_A": "hospital-a",
   "UAT_HOSPITAL_NAME_B": "hospital-b",
   "UAT_HOSPITAL_DB_A": "hospital_a_db",
