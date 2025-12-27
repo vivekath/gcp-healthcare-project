@@ -102,4 +102,5 @@ with DAG(
     # -------------------------------------------------------------------------
     # Task dependencies
     # -------------------------------------------------------------------------
-    [transactions_pipeline, retail_sales_pipeline]
+    transactions_pipeline >> retail_sales_pipeline 
+    # [transactions_pipeline, retail_sales_pipeline]
