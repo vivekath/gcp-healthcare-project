@@ -59,14 +59,14 @@ with DAG(
     transactions_pipeline = BeamRunPythonPipelineOperator(
         task_id="transactions_dataflow_job",
         py_file=f"gs://{COMPOSER_BUCKET}/data/INGESTION/transactions_pipeline.py",
-        pipeline_options={
-            "project": PROJECT_ID,
-            "region": REGION,
-            "runner": "DataflowRunner",
-            "job_name": "transactions",
-            "temp_location": f"gs://{GCS_BUCKET}/temp/",
-            "staging_location": f"gs://{GCS_BUCKET}/staging/",
-        },
+        # pipeline_options={
+        #     "project": PROJECT_ID,
+        #     "region": REGION,
+        #     "runner": "DataflowRunner",
+        #     "job_name": "transactions",
+        #     "temp_location": f"gs://{GCS_BUCKET}/temp/",
+        #     "staging_location": f"gs://{GCS_BUCKET}/staging/",
+        # },
     )
 
     # -------------------------------------------------------------------------
@@ -75,14 +75,14 @@ with DAG(
     retail_sales_pipeline = BeamRunPythonPipelineOperator(
         task_id="retail_sales_dataflow_job",
         py_file=f"gs://{COMPOSER_BUCKET}/data/INGESTION/retail_sales_pipeline.py",
-        pipeline_options={
-            "project": PROJECT_ID,
-            "region": REGION,
-            "runner": "DataflowRunner",
-            "job_name": "transactions",
-            "temp_location": f"gs://{GCS_BUCKET}/temp/",
-            "staging_location": f"gs://{GCS_BUCKET}/staging/",
-        },
+        # pipeline_options={
+        #     "project": PROJECT_ID,
+        #     "region": REGION,
+        #     "runner": "DataflowRunner",
+        #     "job_name": "transactions",
+        #     "temp_location": f"gs://{GCS_BUCKET}/temp/",
+        #     "staging_location": f"gs://{GCS_BUCKET}/staging/",
+        # },
     )
 
     # -------------------------------------------------------------------------
