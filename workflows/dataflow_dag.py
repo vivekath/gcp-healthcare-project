@@ -63,12 +63,12 @@ with DAG(
             "project": PROJECT_ID,
             "region": REGION,
             "runner": "DataflowRunner",
-            "job_name": "test1",
+            "job_name": "transactions",
             "temp_location": f"gs://{GCS_BUCKET}/temp/",
             "staging_location": f"gs://{GCS_BUCKET}/staging/",
             # custom args
-            # "gcs_bucket": GCS_BUCKET,
-            # "project_id": PROJECT_ID,
+            "gcs_bucket": GCS_BUCKET,
+            "project_id": PROJECT_ID,
         },
     )
 
@@ -82,12 +82,12 @@ with DAG(
             "project": PROJECT_ID,
             "region": REGION,
             "runner": "DataflowRunner",
-            "job_name": "test1",
+            "job_name": "retail_sales",
             "temp_location": f"gs://{GCS_BUCKET}/temp/",
             "staging_location": f"gs://{GCS_BUCKET}/staging/",
             # custom args
-            "gcs_bucket": GCS_BUCKET,
-            "project_id": PROJECT_ID,
+            # "gcs_bucket": GCS_BUCKET,
+            # "project_id": PROJECT_ID,
         },
     )
 
