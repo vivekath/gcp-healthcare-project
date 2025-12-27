@@ -65,7 +65,7 @@ def run():
         runner="DataflowRunner",
         project=BQ_PROJECT,
         region="us-east1",
-        job_name="usecase1",
+        job_name="transactions",
         temp_location=f"gs://{GCS_BUCKET}/temp/",
         staging_location=f"gs://{GCS_BUCKET}/staging/"
     )
