@@ -36,12 +36,15 @@ class ValidateAndTransform(beam.DoFn):
 def run():
     import argparse
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--gcs_bucket", required=True)
-    parser.add_argument("--project_id", required=True)
-    args, beam_args = parser.parse_known_args()
-    GCS_BUCKET = args.gcs_bucket
-    BQ_PROJECT = args.project_id
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument("--gcs_bucket", required=True)
+    # parser.add_argument("--project_id", required=True)
+    # args, beam_args = parser.parse_known_args()
+    # GCS_BUCKET = args.gcs_bucket
+    # BQ_PROJECT = args.project_id
+
+    GCS_BUCKET = "dataflow-bkt-26122025"
+    BQ_PROJECT = "quantum-episode-345713"
 
     csv_source_path = f"gs://{GCS_BUCKET}/transactions.csv"
     sink_invalid_path = f"gs://{GCS_BUCKET}/invalid/transactions_invalid"
