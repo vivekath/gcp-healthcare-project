@@ -61,7 +61,6 @@ with DAG(
     transactions_pipeline = BeamRunPythonPipelineOperator(
         task_id="transactions_dataflow_job",
         py_file=f"gs://{COMPOSER_BUCKET}/data/INGESTION/transactions_pipeline.py",
-        py_files=[common_lib_zip],  # Include common_lib
         pipeline_options={
             "project": PROJECT_ID,
             "region": REGION,
@@ -72,6 +71,7 @@ with DAG(
             # custom args
             "gcs_bucket": GCS_BUCKET,
             "project_id": PROJECT_ID,
+            "extra_package": common_lib_zip,
         },
     )
 
@@ -81,7 +81,6 @@ with DAG(
     retail_sales_pipeline = BeamRunPythonPipelineOperator(
         task_id="retail_sales_dataflow_job",
         py_file=f"gs://{COMPOSER_BUCKET}/data/INGESTION/retail_sales_pipeline.py",
-        py_files=[common_lib_zip],  # Include common_lib
         pipeline_options={
             "project": PROJECT_ID,
             "region": REGION,
@@ -91,6 +90,7 @@ with DAG(
             "staging_location": f"gs://{GCS_BUCKET}/staging/",
             # custom args
             "gcs_bucket": GCS_BUCKET,
+            "extra_package": common_lib_zip,
         },
     )
 
