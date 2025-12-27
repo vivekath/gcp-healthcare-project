@@ -1,7 +1,7 @@
 import apache_beam as beam
 from apache_beam.options.pipeline_options import PipelineOptions
 import logging
-from common_lib.constants import Constants
+# from common_lib.constants import Constants
 
 class ValidateAndTransform(beam.DoFn):
     def process(self, element):
@@ -46,7 +46,7 @@ def run():
 
     csv_source_path = f"gs://{GCS_BUCKET}/transactions.csv"
     sink_invalid_path = f"gs://{GCS_BUCKET}/invalid/transactions_invalid"
-    table_id = Constants.BQ.VALID_TRANSACTIONS_TABLE.format(bq_project=BQ_PROJECT)
+    table_id = f"{BQ_PROJECT}.temp_dataset.transactions_valid"
 
     BQ_SCHEMA = (
         "transaction_id:STRING,"

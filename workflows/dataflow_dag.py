@@ -53,8 +53,6 @@ with DAG(
     tags=["dataflow", "beam"],
 ) as dag:
 
-    common_lib_zip = f"gs://{COMPOSER_BUCKET}/data/common/common_lib.zip"
-
     # -------------------------------------------------------------------------
     # Transactions pipeline
     # -------------------------------------------------------------------------
@@ -71,7 +69,6 @@ with DAG(
             # custom args
             "gcs_bucket": GCS_BUCKET,
             "project_id": PROJECT_ID,
-            "extra_package": common_lib_zip,
         },
     )
 
@@ -90,7 +87,6 @@ with DAG(
             "staging_location": f"gs://{GCS_BUCKET}/staging/",
             # custom args
             "gcs_bucket": GCS_BUCKET,
-            "extra_package": common_lib_zip,
         },
     )
 
