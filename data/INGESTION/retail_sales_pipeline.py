@@ -59,10 +59,20 @@ def run():
 
     csv_source_path = f"gs://{GCS_BUCKET}/sales_data.csv"
     csv_destination_path = f"gs://{GCS_BUCKET}/sales_output"
+    BQ_PROJECT = args.project_id
 
-    options = PipelineOptions(beam_args)
 
-    with beam.Pipeline(options=options) as pipeline:
+    # pipeline_options = PipelineOptions(beam_args)
+    pipeline_options = PipelineOptions(
+        runner="DataflowRunner",
+        project=BQ_PROJECT,
+        region="us-east1",
+        job_name="usecase1",
+        temp_location=f"gs://{GCS_BUCKET}/temp/",
+        staging_location=f"gs://{GCS_BUCKET}/staging/"
+    )
+
+    with beam.Pipeline(options=pipeline_options) as pipeline:
         (
             pipeline
             | "Read Sales Data" >> beam.io.ReadFromText(csv_source_path, skip_header_lines=1)

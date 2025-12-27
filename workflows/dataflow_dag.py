@@ -87,6 +87,7 @@ with DAG(
             "staging_location": f"gs://{GCS_BUCKET}/staging/",
             # custom args
             "gcs_bucket": GCS_BUCKET,
+            "project_id": PROJECT_ID,
         },
     )
 

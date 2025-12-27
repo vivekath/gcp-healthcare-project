@@ -1,7 +1,6 @@
 import apache_beam as beam
 from apache_beam.options.pipeline_options import PipelineOptions
 import logging
-# from common_lib.constants import Constants
 
 class ValidateAndTransform(beam.DoFn):
     def process(self, element):
@@ -58,7 +57,15 @@ def run():
         "total_sales:FLOAT64"
     )
 
-    pipeline_options = PipelineOptions(beam_args)
+    # pipeline_options = PipelineOptions(beam_args)
+    pipeline_options = PipelineOptions(
+        runner="DataflowRunner",
+        project=BQ_PROJECT,
+        region="us-east1",
+        job_name="usecase1",
+        temp_location=f"gs://{GCS_BUCKET}/temp/",
+        staging_location=f"gs://{GCS_BUCKET}/staging/"
+    )
 
     with beam.Pipeline(options=pipeline_options) as pipeline:
         pc1 = pipeline | "Read CSV" >> beam.io.ReadFromText(csv_source_path, skip_header_lines=1)
