@@ -1,7 +1,7 @@
 from airflow import DAG
 from airflow.models import Variable
 from airflow.providers.google.cloud.operators.dataflow import (
-    DataflowCreatePythonJobOperator
+    DataflowStartPythonJobOperator
 )
 from airflow.utils.dates import days_ago
 from datetime import datetime, timedelta
@@ -64,7 +64,7 @@ with DAG(
     # -------------------------------------------------------------------------
     # Transactions pipeline
     # -------------------------------------------------------------------------
-    transactions_pipeline = DataflowCreatePythonJobOperator(
+    transactions_pipeline = DataflowStartPythonJobOperator(
         task_id="transactions_dataflow_job",
         py_file=f"gs://{COMPOSER_BUCKET}/data/INGESTION/transactions_pipeline.py",
         job_name="transactions-usecase-{{ ts_nodash }}",
@@ -83,7 +83,7 @@ with DAG(
     # -------------------------------------------------------------------------
     # Retail sales pipeline
     # -------------------------------------------------------------------------
-    retail_sales_pipeline = DataflowCreatePythonJobOperator(
+    retail_sales_pipeline = DataflowStartPythonJobOperator(
         task_id="retail_sales_dataflow_job",
         py_file=f"gs://{COMPOSER_BUCKET}/data/INGESTION/retail_sales_pipeline.py",
         job_name="retail-sales-usecase-{{ ts_nodash }}",
